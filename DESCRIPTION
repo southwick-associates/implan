@@ -9,8 +9,8 @@ Description: Spending needs to be translated into Implan sectors, and saved
     synthesized for contribution results.
 License: For Southwick use only
 Imports:
-    dplyr (>= 0.8.4),
-    openxlsx (>= 4.1.4)
+    dplyr,
+    openxlsx
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.0.2

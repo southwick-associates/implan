@@ -4,7 +4,7 @@
 A Southwick-only R package to streamline the process of working with Implan. It helps with:
 
 1. Converting spending estimates to spending by implan sector
-2. Writing excel worksheets (Industry/Commercial) that are import as Implan activities
+2. Writing excel worksheets (Industry/Commercial) to be imported as Implan activities
 3. Synthesizing Implan output (csv) into a table of economic contribution results
 
 ## Installation
