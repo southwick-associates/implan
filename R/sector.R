@@ -17,7 +17,7 @@
 #' check_share_sums(sector_scheme536, share, category)
 #'
 #' # update to 546 sector scheme and check
-#' sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, description_new)
+#' sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, sectors546)
 #' check_share_sums(sector_scheme546, share, category)
 sector_update <- function(
     scheme_old, crosswalk, description_new,
