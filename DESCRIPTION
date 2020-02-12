@@ -1,0 +1,16 @@
+Package: implan
+Type: Package
+Title: Work with Implan Data
+Version: 0.1.0
+Author: Dan Kary
+Maintainer: Dan Kary <dan@southwickassociates.com>
+Description: Spending needs to be translated into Implan sectors, and saved
+    in Excel (xls) for import. The scenario results (csv) then need to be
+    synthesized for contribution results.
+License: For Southwick use only
+Imports:
+    dplyr >= 0.8.4,
+    openxlsx >= 4.1.4
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.0.2
