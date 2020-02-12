@@ -5,7 +5,7 @@
 \title{Update sectoring scheme with crosswalk table}
 \usage{
 sector_update(
-  sectors_old,
+  scheme_old,
   crosswalk,
   description_new,
   id_old = "sector536",
@@ -13,7 +13,7 @@ sector_update(
 )
 }
 \arguments{
-\item{sectors_old}{data frame that holds spending by old sector}
+\item{scheme_old}{data frame that holds old sectoring scheme}
 
 \item{crosswalk}{data frame for converting between new and old sectors}
 
@@ -25,5 +25,20 @@ sector_update(
 }
 \description{
 Update sectoring scheme with crosswalk table
+}
+\examples{
+# load sample data
+data(sector_scheme536, sectors_crosswalk, sectors546)
+
+# check the sector allocation for the 536 sector scheme (should be TRUE)
+check_share_sums(sector_scheme536, share, category)
+
+# update to 546 sector scheme and check
+sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, description_new)
+check_share_sums(sector_scheme546, share, category)
+}
+\seealso{
+Other functions to get spending by implan sector: 
+\code{\link{check_share_sums}()}
 }
 \concept{functions to get spending by implan sector}

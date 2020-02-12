@@ -3,7 +3,7 @@
 library(dplyr)
 library(readxl)
 
-f <- "inst/extdata/Implan546 Industries & Commodities.xlsx"
+f <- "inst/extdata/Implan546IndustriesandCommodities.xlsx"
 x <- read_excel(f, sheet = "Industries") %>%
     rename(sector = Implan546Index, description = Implan546Description) %>%
     mutate(group = "Ind")
@@ -12,4 +12,4 @@ y <- read_excel(f, sheet = "Commodities") %>%
     mutate(group = "Comm")
 sectors546 <- bind_rows(x, y)
 
-usethis::use_data(sectors546)
+usethis::use_data(sectors546, overwrite = TRUE)

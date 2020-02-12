@@ -8,6 +8,7 @@ Description: Spending needs to be translated into Implan sectors, and saved
     in Excel (xls) for import. The scenario results (csv) then need to be
     synthesized for contribution results.
 License: For Southwick use only
+Depends: R (>= 3.5.0)
 Imports:
     dplyr,
     openxlsx

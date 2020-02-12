@@ -20,4 +20,4 @@ TODO
 
 ## Package Development
 
-The software environment was specified using package [renv](https://rstudio.github.io/renv/index.html) which makes use of `.Rprofile` and `renv` files. You can use `renv::restore()` to set the project library.
+See [R packages book]](http://r-pkgs.had.co.nz/) for instructions on package development. The software environment was specified using package [renv](https://rstudio.github.io/renv/index.html) which makes use of `.Rprofile` and `renv` files. You can use `renv::restore()` to set the project library.

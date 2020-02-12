@@ -4,14 +4,14 @@
 \name{sectors536}
 \alias{sectors536}
 \title{Implan 536 sector descriptions}
-\format{A data frame with 1093 rows and 3 variables:
+\format{A data frame with 1072 rows and 3 variables:
 \describe{
   \item{sector}{sector ID}
-  \item{description}(sector description)
+  \item{description}{sector description}
   \item{group}{group: "Ind" or "Comm"}
 }}
 \source{
-\url{ https://implanhelp.zendesk.com/hc/en-us/articles/115002997573-536-Sector-Industries-Conversions-Bridges-Construction-2013-2017-Data}
+\url{https://implanhelp.zendesk.com/hc/en-us/articles/115002997573-536-Sector-Industries-Conversions-Bridges-Construction-2013-2017-Data}
 }
 \usage{
 sectors536
@@ -20,4 +20,11 @@ sectors536
 A dataset containing sector IDs and descriptions prepared from
 `system.file("extdata", "Implan536_Industries_and_Commodities.xlsx", package = "implan")`
 }
+\seealso{
+Other data: 
+\code{\link{sector_scheme536}},
+\code{\link{sectors546}},
+\code{\link{sectors_crosswalk}}
+}
+\concept{data}
 \keyword{datasets}
