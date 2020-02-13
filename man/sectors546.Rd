@@ -24,6 +24,7 @@ A dataset containing sector IDs and descriptions prepared from
 Other data: 
 \code{\link{categories}},
 \code{\link{sector_scheme536}},
+\code{\link{sector_scheme546}},
 \code{\link{sectors536}},
 \code{\link{sectors_crosswalk}},
 \code{\link{spending}}

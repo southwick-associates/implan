@@ -26,10 +26,17 @@ Using R makes it easy to scale-up (or down) without the tedious manual editing i
 
 ## Implan Sector Allocation
 
-Results expenditures need to be specified at the correct dimension (Implan sectors). 
+Spending results need to be specified at the correct dimension (Implan sectors). Doing so requires 1 or more crosswalk tables, which would normally be built in Excel. The implan package includes example data to demonstrate the allocation process:
 
 ```{r}
 library(dplyr)
 library(implan)
+
+data(spending) # total spending by item
+data(categories) # implan category crosswalk
+data(sector_scheme546) # implan sector crosswalk
+
+# TODO: save sector_scheme546
+
 ```
 

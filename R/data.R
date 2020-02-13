@@ -63,6 +63,22 @@
 #' @family data
 "sector_scheme536"
 
+#' Implan sectoring scheme (546) for hunting
+#'
+#' A dataset that defines how hunting expenditures will be allocated to implan
+#'
+#' @format A data frame with 152 rows (uniquely identified with category-sector) and 6 columns:
+#' \describe{
+#'   \item{group}{"Ind" or "Comm"}
+#'   \item{category}{spending category (e.g., "Food - Groceries", etc.)}
+#'   \item{sector}{implan sector ID}
+#'   \item{description}{implan sector description}
+#'   \item{share}{share of category to be allocated by sector}
+#'   \item{retail}{"Yes" or "No"}
+#' }
+#' @family data
+"sector_scheme546"
+
 #' Implan hunting spending categories
 #'
 #' A dataset to relate national survey spending data with implan spending categories

@@ -21,6 +21,7 @@ from `system.file("extdata", "spend2019.rds", package = "implan")`
 Other data: 
 \code{\link{categories}},
 \code{\link{sector_scheme536}},
+\code{\link{sector_scheme546}},
 \code{\link{sectors536}},
 \code{\link{sectors546}},
 \code{\link{sectors_crosswalk}}

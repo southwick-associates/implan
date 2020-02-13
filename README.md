@@ -14,10 +14,10 @@ remotes::install_github("southwick-associates/implan")
 
 See the vignettes:
 
-- [Preparing for Implan import & export](github-vignettes/implan-transfer.md)
-- [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
+- [Implan preparation, import, and export](github-vignettes/implan-transfer.md)
 - [Writing multiple results to one Excel workbook](github-vignettes/write-excel.md)
+- [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
 
-## Package Development
+## Development
 
-See the [R packages](http://r-pkgs.had.co.nz/) book for instructions on package development. The software environment was specified using package [renv](https://rstudio.github.io/renv/index.html) which makes use of `.Rprofile` and `renv` files. You can use `renv::restore()` to set the project library.
+See the [R packages book](http://r-pkgs.had.co.nz/) for a guide to package development. The software environment was specified using [package renv](https://rstudio.github.io/renv/index.html). You can use `renv::restore()` to build the project library.
