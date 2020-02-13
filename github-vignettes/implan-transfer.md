@@ -6,10 +6,8 @@
 The implan package streamlines the steps otherwise done in Excel:
 
 1.  [Allocate spending by Implan sector](#implan-sector-allocation)
-2.  [Write Excel tabs (Industry/Commercial) for Implan
-    import](#write-to-excel)
-3.  [Pull all Implan output (csv) into one table of
-    results](#read-from-csv)
+2.  [Write Excel tabs for Implan import](#write-to-excel)
+3.  [Pull all Implan output (csv) into one table](#read-from-csv)
 
 ### Elevator Pitch
 
@@ -19,10 +17,10 @@ straightforward scripts with built-in checks & summaries.
 
 ## Implan Sector Allocation
 
-Allocating spending results to implan sectors requires 1 or more
-crosswalk tables (typically built in Excel, see the [readxl
-package](https://readxl.tidyverse.org/)). The implan package includes
-example data to demonstrate the allocation process:
+Allocating spending to Implan sectors requires 1 or more crosswalk
+tables (typically built in Excel). The implan package includes example
+data to demonstrate the allocation process (see `read_excel` from the
+[readxl package](https://readxl.tidyverse.org/) for production scripts):
 
 ``` r
 library(dplyr)
@@ -40,12 +38,11 @@ head(spending, 2)
 ### Categories
 
 For the sample data, spending must first be reallocated from the “item”
-level to the “implan category” level using the `share` variable.
-Spending is specified by 2 dimensions (`type`, `item`); for which share
-must sum to 100%:
+level to the “category” level. Spending is specified by 2 dimensions
+(`type`, `item`) for which share must sum to 100%:
 
 ``` r
-data(categories) # implan category crosswalk
+data(categories) # category crosswalk
 head(categories, 2)
 #> # A tibble: 2 x 4
 #>   type  item  category          share
