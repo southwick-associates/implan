@@ -1,18 +1,18 @@
 # functions to transfer to/from implan
 
-# Input -------------------------------------------------------------------
+# Prep Input -------------------------------------------------------------------
 
 #' Get a header table for Implan import
 #'
-#' This is a convenience function called from \code{\link{implan_prepare}}
+#' This is a convenience function called from \code{\link{input_prepare}}
 #'
-#' @inheritParams implan_prepare
+#' @inheritParams input_prepare
 #' @param activity_type either "Industry Change" or "Commodity Change"
 #' @family functions to transfer to/from implan
 #' @export
 #' @examples
-#' # see ?implan_prepare
-implan_header <- function(activity_type, activity_name, event_year) {
+#' # see ?input_prepare
+input_header <- function(activity_type, activity_name, event_year) {
     tribble(
         ~`Activity Type`, ~`Activity Name`, ~`Activity Level`, ~`Activity Year`,
         activity_type, activity_name, 1, event_year
@@ -28,7 +28,7 @@ implan_header <- function(activity_type, activity_name, event_year) {
 #' @param dat data frame with spending by sector
 #' @param activity_name Activity Name used for Implan
 #' @param event_year Activity Year for Implan
-#' @name implan_prepare
+#' @name input_prepare
 #' @family functions to transfer to/from implan
 #' @examples
 #' # get necessary sectoring
@@ -51,23 +51,102 @@ implan_header <- function(activity_type, activity_name, event_year) {
 #' check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 #'
 #' # allocate for implan import (Industry)
-#' ls <- implan_prepare_ind(spend_sector, "huntInd")
+#' ls <- input_prepare_ind(spend_sector, "huntInd")
 #' ls
 #'
 #' # write to an excel file
 NULL
 
-#' @describeIn implan_prepare Prepare industry data
+#' @describeIn input_prepare Prepare industry data
 #' @export
-implan_prepare_ind <- function(dat, activity_name, event_year = 2019) {
-    header <- implan_header("Industry Change", activity_name, event_year)
+input_prepare_ind <- function(dat, activity_name, event_year = 2019) {
+    header <- input_header("Industry Change", activity_name, event_year)
     dat <- dat %>%
         filter(.data$group == "Ind") %>%
         arrange(.data$sector) %>%
         mutate(emp = 0, comp = 0, inc = 0, yr = event_year, loc = 1) %>%
-        select(Sector = .data$sector, `Event Value` = .data$spend,
-               Employment = .data$emp, `Employee Compensation` = .data$comp,
-               `Proprietor Income` = .data$inc, EventYear = .data$yr,
-               Retail = .data$retail, `Local Direct Purchase` = .data$loc)
+        select(
+            Sector = .data$sector, `Event Value` = .data$spend,
+            Employment = .data$emp, `Employee Compensation` = .data$comp,
+            `Proprietor Income` = .data$inc, EventYear = .data$yr,
+            Retail = .data$retail, `Local Direct Purchase` = .data$loc
+        )
     list("header" = header, "dat" = dat)
 }
+
+#' @describeIn input_prepare Prepare commodity data
+#' @export
+input_prepare_comm <- function(dat, activity_name, event_year = 2019) {
+    header <- implan_header("Commodity Change", activity_name, event_year)
+    dat <- dat %>%
+        filter(.data$group == "Comm") %>%
+        arrange(.data$sector) %>%
+        mutate(yr = event_year, loc = 1) %>%
+        select(
+            Sector = .data$sector, `Event Value` = .data$spend,
+            EventYear = .data$yr, Retail = .data$retail,
+            `Local Direct Purchase` = .data$loc
+        )
+    list("header" = header, "dat" = dat)
+}
+
+# Write Input -------------------------------------------------------------
+
+#' Initialize an Excel Workbook with a README tab
+#'
+#' The README sheet is intended to serve as documentation for the results
+#' stored in the Excel file.
+#'
+#' @param filename path where the Excel workbook will be written
+#' @family functions to transfer to/from implan
+#' @export
+xlsx_initialize_workbook <- function(filename) {
+    if (file.exists(filename)) {
+        return(invisible()) # an existing file won't be overwritten
+    }
+    wb <- openxlsx::createWorkbook()
+    openxlsx::addWorksheet(wb, "README")
+    openxlsx::saveWorkbook(wb, filename)
+}
+
+#' Write a data frame to an Excel tab
+#'
+#' Requires an existing Excel file, preferably created using
+#' \code{\link{xlsx_initialize_workbook}}. The selected tab will be removed
+#' (if it already exists) and a new tab will be written.
+#'
+#' @param df data frame to write to the Excel worksheet
+#' @param tabname name to use for Excel worksheet
+#' @family functions to transfer to/from implan
+#' @export
+xlsx_write_table <- function(df, tabname, filename) {
+    wb <- openxlsx::loadWorkbook(filename)
+    if (tabname %in% openxlsx::getSheetNames(filename)) {
+        openxlsx::removeWorksheet(wb, tabname)
+    }
+    openxlsx::addWorksheet(wb, tabname)
+    openxlsx::writeData(wb, sheet = tabname, df)
+    openxlsx::saveWorkbook(wb, filename, overwrite = TRUE)
+}
+
+#' Write data to a sheet for Excel Implan import
+#'
+#' @param ls list returned from implan_prepare_ind() or implan_prepare_comm()
+#' @param xls_out file path for output excel file
+#' @param tabname name of sheet to be written to xls_out
+#' @family functions to transfer to/from implan
+#' @export
+xlsx_write_implan <- function(ls, xls_out, tabname) {
+    tabname <- ls$header$`Activity Name` # worksheet name will match activity name
+    xlsx_initialize_workbook(xls_out)
+    wb <- openxlsx::loadWorkbook(xls_out)
+    if (tabname %in% openxlsx::getSheetNames(xls_out)) {
+        openxlsx::removeWorksheet(wb, tabname)
+    }
+    openxlsx::addWorksheet(wb, tabname)
+    openxlsx::writeData(wb, sheet = tabname, ls$header)
+    openxlsx::writeData(wb, sheet = tabname, ls$dat, startRow = 4)
+    openxlsx::saveWorkbook(wb, xls_out, overwrite = TRUE)
+}
+
+# Load Output -------------------------------------------------------------

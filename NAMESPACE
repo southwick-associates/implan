@@ -2,7 +2,11 @@
 
 export(check_share_sums)
 export(check_spend_sums)
-export(implan_header)
-export(implan_prepare_ind)
+export(input_header)
+export(input_prepare_comm)
+export(input_prepare_ind)
 export(sector_update)
+export(xlsx_initialize_workbook)
+export(xlsx_write_implan)
+export(xlsx_write_table)
 import(dplyr)
