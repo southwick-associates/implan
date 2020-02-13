@@ -8,7 +8,7 @@ This can be helpful for packaging multiple results (e.g., spending
 profiles) into a single file for easily sharing with colleagues. It uses
 [package openxlsx](https://ycphs.github.io/openxlsx/index.html).
 
-## Initializing
+### Initializing a Workbook
 
 The first step is to create an Excel workbook using
 `xlsx_initialize_workbook()`. This makes an Excel file with a single
@@ -24,13 +24,13 @@ openxlsx::getSheetNames("tmp.xlsx")
 #> [1] "README"
 ```
 
-## Adding Results
+### Adding Results
 
 R data frames can be written directly to an Excel file with
 `xlsx_write_table()`:
 
 ``` r
-# get some sample data from the implan package
+# use sample data from implan package
 data(spending)
 head(spending, 2)
 #> # A tibble: 2 x 3
@@ -39,38 +39,25 @@ head(spending, 2)
 #> 1 trip  food  14824024.
 #> 2 trip  lodge  3589912.
 
-# write to Excel
-xlsx_write_table(df = spending, tabname = "spending", "tmp.xlsx")
+xlsx_write_table(spending, "spending", "tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
 #> [1] "README"   "spending"
-
-openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
-#>   type  item    spend
-#> 1 trip  food 14824024
-#> 2 trip lodge  3589912
 ```
 
-## Updating Results
+### Updating Results
 
 Additional calls to `xlsx_write_table()` will simply overwrite tabs with
 the same name, so you can easily update results. This does imply that
 you shouldn’t manually edit the Excel file (other than the README tab).
 
 ``` r
-data(categories)
-head(categories, 2)
-#> # A tibble: 2 x 4
-#>   type  item  category          share
-#>   <chr> <chr> <chr>             <dbl>
-#> 1 trip  food  Food - Restaurant   0.5
-#> 2 trip  food  Food - Groceries    0.5
-
+# update "spending" to show by category
+data(categories) 
 left_join(spending, categories, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
     xlsx_write_table("spending", "tmp.xlsx")
 
-spend_category <- openxlsx::readWorkbook("tmp.xlsx", "spending")
-head(spend_category, 2)
+openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
 #>   type item   spend          category share
 #> 1 trip food 7412012 Food - Restaurant   0.5
 #> 2 trip food 7412012  Food - Groceries   0.5
