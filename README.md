@@ -3,10 +3,6 @@
 
 A Southwick-only R package that streamlines the process of working with Implan. It also provides some convenience functions for writing results to Excel worksheets.
 
-1. Converting spending estimates to spending by implan sector
-2. Writing excel worksheets (Industry/Commercial) to be imported as Implan activities
-3. Synthesizing Implan output (csv) into a table of economic contribution results
-
 ## Installation
 
 ```r
@@ -18,24 +14,9 @@ remotes::install_github("southwick-associates/implan")
 
 See the vignettes:
 
-- Preparing for Implan import & export
-- Updating to a new sectoring scheme 
+- [Preparing for Implan import & export](github-vignettes/implan-transfer.md)
+- [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
 - [Writing multiple results to one Excel workbook](github-vignettes/write-excel.md)
-
-```r
-library(implan)
-
-# for updating implan sectoring schemes & allocating spending
-?sector_update()
-
-# for preparing implan Excel input
-?input_prep()
-?xlsx_write_implan()
-# then manually save as .xls
-
-# for synthesizing implan csv output
-?csv_read_implan()
-```
 
 ## Package Development
 

@@ -1,7 +1,5 @@
 # functions to transfer to/from implan
 
-# TODO: add xlsx_write_implan() example to input_prep
-
 # Prep Input -------------------------------------------------------------------
 
 #' Get a header table for Implan import
