@@ -2,5 +2,7 @@
 
 export(check_share_sums)
 export(check_spend_sums)
+export(implan_header)
+export(implan_prepare_ind)
 export(sector_update)
 import(dplyr)
