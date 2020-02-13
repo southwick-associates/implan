@@ -6,7 +6,7 @@
 \title{Implan total hunting spending}
 \format{A data frame with 46 rows and 3 columns"
 \describe{
-  \item{spend_type}{"trip" or "equip"}
+  \item{type}{"trip" or "equip"}
   \item{item}{food, lodge, etc.}
   \item{spend}{total spending}
 }}

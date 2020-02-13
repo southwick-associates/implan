@@ -16,12 +16,12 @@ remotes::install_github("southwick-associates/implan")
 
 ## Usage
 
-TODO: Will add a vignette to provide an example workflow.
+TODO: Plan to add a vignette to provide a well-explained example workflow.
 
 ```r
 library(implan)
 
-# for updating implan sectoring schemes
+# for updating implan sectoring schemes & allocating spending
 ?sector_update()
 
 # for preparing implan Excel input

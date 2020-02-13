@@ -21,6 +21,7 @@ Check whether the share variable sums to 100 percent
 }
 \seealso{
 Other functions to get spending by implan sector: 
+\code{\link{check_spend_sums}()},
 \code{\link{sector_update}()}
 }
 \concept{functions to get spending by implan sector}

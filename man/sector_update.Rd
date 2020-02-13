@@ -36,9 +36,24 @@ check_share_sums(sector_scheme536, share, category)
 # update to 546 sector scheme and check
 sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, sectors546)
 check_share_sums(sector_scheme546, share, category)
+
+# get total spending by categories
+data(spending, categories)
+spend_category <- spending \%>\%
+    left_join(categories, by = c("type", "item")) \%>\%
+    mutate(spend = spend * share)
+check_spend_sums(spending, spend_category, spend, type, item)
+
+# get total spending by sectors
+spend_sector <- spend_category \%>\%
+    select(-share) \%>\%
+    left_join(sector_scheme546, by = "category") \%>\%
+    mutate(spend = spend * share)
+check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 }
 \seealso{
 Other functions to get spending by implan sector: 
-\code{\link{check_share_sums}()}
+\code{\link{check_share_sums}()},
+\code{\link{check_spend_sums}()}
 }
 \concept{functions to get spending by implan sector}
