@@ -16,9 +16,9 @@ library(implan)
 
 The implan package streamlines the steps otherwise done in Excel:
 
-1. Allocate spending by Implan sector
-2. Write Excel tabs (Industry/Commercial) for Implan import
-3. Pull all Implan output (csv) into one table of results
+1. [Allocate spending by Implan sector](#implan-sector-allocation)
+2. [Write Excel tabs (Industry/Commercial) for Implan import](#write-to-excel)
+3. [Pull all Implan output (csv) into one table of results](#read-from-csv)
 
 ### Elevator Pitch
 

@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 *.Rproj
-tmp.xlsx
-tmp.xls
+tmp*
 github-vignettes/tmp*
