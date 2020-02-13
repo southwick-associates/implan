@@ -8,13 +8,12 @@ This can be helpful for packaging multiple results (e.g., spending
 profiles) into a single file for easily sharing with colleagues. It uses
 [package openxlsx](https://ycphs.github.io/openxlsx/index.html).
 
-### Initializing
+## Initializing
 
 The first step is to create an Excel workbook using
 `xlsx_initialize_workbook()`. This makes an Excel file with a single
-“README” tab. I recommend always including a README as the first tab
-for documentation. It will persist as you add additional tabs that
-include results data.
+“README” tab. I recommend always including a README for documentation
+(to be edited manually in Excel).
 
 ``` r
 library(dplyr)
@@ -25,7 +24,10 @@ openxlsx::getSheetNames("tmp.xlsx")
 #> [1] "README"
 ```
 
-### Adding Results
+## Adding Results
+
+R data frames can be written directly to an Excel file with
+`xlsx_write_table()`:
 
 ``` r
 # get some sample data from the implan package
@@ -48,9 +50,11 @@ openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
 #> 2 trip lodge  3589912
 ```
 
-### Updating Results
+## Updating Results
 
-It’s easy to update existing results stored in Excel worksheets:
+Additional calls to `xlsx_write_table()` will simply overwrite tabs with
+the same name, so you can easily update results. This does imply that
+you shouldn’t manually edit the Excel file (other than the README tab).
 
 ``` r
 data(categories)
