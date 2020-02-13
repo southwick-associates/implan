@@ -18,6 +18,11 @@ Requires an existing Excel file, preferably created using
 \code{\link{xlsx_initialize_workbook}}. The selected tab will be removed
 (if it already exists) and a new tab will be written.
 }
+\examples{
+xlsx_initialize_workbook("tmp.xlsx")
+df <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
+xlsx_write_table(df, "moria", "tmp.xlsx")
+}
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},

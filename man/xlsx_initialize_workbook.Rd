@@ -13,6 +13,9 @@ xlsx_initialize_workbook(filename)
 The README sheet is intended to serve as documentation for the results
 stored in the Excel file.
 }
+\examples{
+xlsx_initialize_workbook("tmp.xlsx")
+}
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},

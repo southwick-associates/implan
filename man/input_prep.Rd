@@ -53,7 +53,9 @@ check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 ls <- input_prep_ind(spend_sector, "huntInd")
 ls
 
-# write to an excel file
+# write to an excel worksheet
+xlsx_write_implan(ls, "tmp.xlsx")
+# you'll need to manually save as ".xls" (in Excel) from Implan import
 }
 \seealso{
 Other functions to transfer to/from implan: 

@@ -16,7 +16,11 @@ remotes::install_github("southwick-associates/implan")
 
 ## Usage
 
-TODO: Plan to add a vignette to provide a well-explained example workflow.
+See the vignettes:
+
+- Preparing for Implan import & export
+- Updating to a new sectoring scheme 
+- Writing multiple results to one Excel workbook
 
 ```r
 library(implan)
@@ -27,10 +31,10 @@ library(implan)
 # for preparing implan Excel input
 ?input_prep()
 ?xlsx_write_implan()
+# then manually save as .xls
 
 # for synthesizing implan csv output
 ?csv_read_implan()
-?output_load()
 ```
 
 ## Package Development

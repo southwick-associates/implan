@@ -5,3 +5,5 @@
 ^\.Rprofile$
 ^README\.md$
 ^data-raw$
+^tmp\.xlsx$
+^tmp\.xls$

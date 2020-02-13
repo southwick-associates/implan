@@ -56,7 +56,9 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' ls <- input_prep_ind(spend_sector, "huntInd")
 #' ls
 #'
-#' # write to an excel file
+#' # write to an excel worksheet
+#' xlsx_write_implan(ls, "tmp.xlsx")
+#' # you'll need to manually save as ".xls" (in Excel) from Implan import
 NULL
 
 #' @describeIn input_prep Prepare industry data
@@ -102,6 +104,8 @@ input_prep_comm <- function(dat, activity_name, event_year = 2019) {
 #' @param filename path where the Excel workbook will be written
 #' @family functions to transfer to/from implan
 #' @export
+#' @examples
+#' xlsx_initialize_workbook("tmp.xlsx")
 xlsx_initialize_workbook <- function(filename) {
     if (file.exists(filename)) {
         return(invisible()) # an existing file won't be overwritten
@@ -122,6 +126,10 @@ xlsx_initialize_workbook <- function(filename) {
 #' @inheritParams xlsx_initialize_workbook
 #' @family functions to transfer to/from implan
 #' @export
+#' @examples
+#' xlsx_initialize_workbook("tmp.xlsx")
+#' df <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
+#' xlsx_write_table(df, "moria", "tmp.xlsx")
 xlsx_write_table <- function(df, tabname, filename) {
     wb <- openxlsx::loadWorkbook(filename)
     if (tabname %in% openxlsx::getSheetNames(filename)) {
@@ -136,10 +144,11 @@ xlsx_write_table <- function(df, tabname, filename) {
 #'
 #' @param ls list returned from implan_prepare_ind() or implan_prepare_comm()
 #' @param xls_out file path for output excel file
-#' @param tabname name of sheet to be written to xls_out
 #' @family functions to transfer to/from implan
 #' @export
-xlsx_write_implan <- function(ls, xls_out, tabname) {
+#' @examples
+#' # see ?input_prep()
+xlsx_write_implan <- function(ls, xls_out) {
     tabname <- ls$header$`Activity Name` # worksheet name will match activity name
     xlsx_initialize_workbook(xls_out)
     wb <- openxlsx::loadWorkbook(xls_out)
