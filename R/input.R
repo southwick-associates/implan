@@ -63,7 +63,7 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' # you'll need to manually save as ".xls" (in Excel) from Implan import
 input_prep <- function(dat, activity_name, event_year = 2019, group) {
     # collapse to sector-retail & add variables that might be needed
-    sector_group <- group
+    sector_group <- group # to ensure the filter works correctly
     dat <- dat %>%
         filter(.data$group == sector_group) %>%
         group_by(.data$sector, .data$retail) %>%

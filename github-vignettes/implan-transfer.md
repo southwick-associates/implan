@@ -11,16 +11,16 @@ The implan package streamlines the steps otherwise done in Excel:
 
 ### Elevator Pitch
 
-Using R makes it easy to scale-up (or down) without the tedious manual
-editing in Excel. It’s also less error-prone because you can write
-straightforward scripts with built-in checks & summaries.
+R code can be easily scaled up/down or ported to a new project without
+the manual restructuring needed in Excel. It’s also less error-prone and
+facilitates automated checks/summaries.
 
 ## Implan Sector Allocation
 
 Allocating spending to Implan sectors requires 1 or more crosswalk
-tables (typically built in Excel). The implan package includes example
-data to demonstrate the allocation process (see `read_excel` from the
-[readxl package](https://readxl.tidyverse.org/) for production scripts):
+tables. The implan package includes example data to demonstrate the
+allocation process. You can use `read_excel` from the [readxl
+package](https://readxl.tidyverse.org/) for data stored in Excel.
 
 ``` r
 library(dplyr)
@@ -39,10 +39,10 @@ head(spending, 2)
 
 For the sample data, spending must first be reallocated from the “item”
 level to the “category” level. Spending is specified by 2 dimensions
-(`type`, `item`) for which share must sum to 100%:
+(`type`, `item`) for which `share` must sum to 100%:
 
 ``` r
-data(categories) # category crosswalk
+data(categories) # item-category crosswalk
 head(categories, 2)
 #> # A tibble: 2 x 4
 #>   type  item  category          share
@@ -82,7 +82,7 @@ In the same way, allocating to sectors uses a sectoring scheme crosswalk
 (at the `category` dimension):
 
 ``` r
-data(sector_scheme546) # implan sector crosswalk
+data(sector_scheme546) # category-sector crosswalk
 head(sector_scheme546, 2)
 #> # A tibble: 2 x 6
 #>   group category sector description                       share retail

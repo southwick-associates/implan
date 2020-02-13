@@ -41,7 +41,7 @@ head(spending, 2)
 For the sample data, spending must first be reallocated from the "item" level to the "category" level. Spending is specified by 2 dimensions (`type`, `item`) for which `share` must sum to 100%:
 
 ```{r}
-data(categories) # category crosswalk
+data(categories) # item-category crosswalk
 head(categories, 2)
 
 # check the share variable - should print "TRUE"
@@ -67,7 +67,7 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 In the same way, allocating to sectors uses a sectoring scheme crosswalk (at the `category` dimension):
 
 ```{r}
-data(sector_scheme546) # implan sector crosswalk
+data(sector_scheme546) # category-sector crosswalk
 head(sector_scheme546, 2)
 
 check_share_sums(sector_scheme546, sharevar = share, category)
