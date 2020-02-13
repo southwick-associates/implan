@@ -59,12 +59,13 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' ind
 #'
 #' # write to an excel worksheet
-#' xlsx_write_implan(ls, "tmp.xlsx")
+#' xlsx_write_implan(ind, "tmp.xlsx")
 #' # you'll need to manually save as ".xls" (in Excel) from Implan import
 input_prep <- function(dat, activity_name, event_year = 2019, group) {
     # collapse to sector-retail & add variables that might be needed
+    sector_group <- group
     dat <- dat %>%
-        filter(.data$group == "Ind") %>%
+        filter(.data$group == sector_group) %>%
         group_by(.data$sector, .data$retail) %>%
         summarise(spend = sum(.data$spend)) %>%
         ungroup() %>%

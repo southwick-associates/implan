@@ -61,7 +61,7 @@ ind <- input_prep_ind(spend_sector, "huntInd")
 ind
 
 # write to an excel worksheet
-xlsx_write_implan(ls, "tmp.xlsx")
+xlsx_write_implan(ind, "tmp.xlsx")
 # you'll need to manually save as ".xls" (in Excel) from Implan import
 }
 \seealso{
