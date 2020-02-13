@@ -5,5 +5,4 @@
 *.Rproj
 tmp.xlsx
 tmp.xls
-github-vignettes/tmp.xlsx
-github-vignettes/tmp.xls
+github-vignettes/tmp*
