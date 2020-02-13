@@ -19,7 +19,7 @@ xlsx_initialize_workbook("tmp.xlsx")
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},
-\code{\link{input_prep}},
+\code{\link{input_prep}()},
 \code{\link{xlsx_write_implan}()},
 \code{\link{xlsx_write_table}()}
 }

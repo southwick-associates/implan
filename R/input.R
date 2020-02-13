@@ -23,12 +23,15 @@ input_header <- function(activity_type, activity_name, event_year) {
 #'
 #' This function splits an input data frame into a list with 2 data frames:
 #' (1) a sheet header with activity details used by implan, and (2) the
-#' sector spending with additional columns which implan will calculate
+#' sector spending with additional columns which implan will calculate. The data
+#' portion is also grouped by sector-retail to ensure the minimum number of rows.
 #'
-#' @param dat data frame with spending by sector
+#' @param dat data frame with spending by sector with 4 required columns:
+#' group ("Ind" or "Comm"), sector (numeric), retail ("Yes" or "No"), spend (numeric)
 #' @param activity_name Activity Name used for Implan
 #' @param event_year Activity Year for Implan
-#' @name input_prep
+#' @param group Either "Ind" or "Comm"
+#' @export
 #' @family functions to transfer to/from implan
 #' @examples
 #' # get necessary sectoring
@@ -51,45 +54,52 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 #'
 #' # allocate for implan import (Industry)
-#' ls <- input_prep_ind(spend_sector, "huntInd")
-#' ls
+#' comm <- input_prep_comm(spend_sector, "huntComm")
+#' ind <- input_prep_ind(spend_sector, "huntInd")
+#' ind
 #'
 #' # write to an excel worksheet
 #' xlsx_write_implan(ls, "tmp.xlsx")
 #' # you'll need to manually save as ".xls" (in Excel) from Implan import
-NULL
-
-#' @describeIn input_prep Prepare industry data
-#' @export
-input_prep_ind <- function(dat, activity_name, event_year = 2019) {
-    header <- input_header("Industry Change", activity_name, event_year)
+input_prep <- function(dat, activity_name, event_year = 2019, group) {
+    # collapse to sector-retail & add variables that might be needed
     dat <- dat %>%
         filter(.data$group == "Ind") %>%
-        arrange(.data$sector) %>%
-        mutate(emp = 0, comp = 0, inc = 0, yr = event_year, loc = 1) %>%
-        select(
+        group_by(.data$sector, .data$retail) %>%
+        summarise(spend = sum(.data$spend)) %>%
+        ungroup() %>%
+        mutate(emp = 0, comp = 0, inc = 0, yr = event_year, loc = 1)
+
+    if (group == "Ind") {
+        header <- input_header("Industry Change", activity_name, event_year)
+        dat <- dat %>% select(
             Sector = .data$sector, `Event Value` = .data$spend,
             Employment = .data$emp, `Employee Compensation` = .data$comp,
             `Proprietor Income` = .data$inc, EventYear = .data$yr,
             Retail = .data$retail, `Local Direct Purchase` = .data$loc
         )
+
+    } else {
+        header <- input_header("Commodity Change", activity_name, event_year)
+        dat <- dat %>% select(
+            Sector = .data$sector, `Event Value` = .data$spend,
+            EventYear = .data$yr, Retail = .data$retail,
+            `Local Direct Purchase` = .data$loc
+        )
+    }
     list("header" = header, "dat" = dat)
+}
+
+#' @describeIn input_prep Prepare industry data
+#' @export
+input_prep_ind <- function(dat, activity_name, event_year = 2019) {
+    input_prep(dat, activity_name, event_year, "Ind")
 }
 
 #' @describeIn input_prep Prepare commodity data
 #' @export
 input_prep_comm <- function(dat, activity_name, event_year = 2019) {
-    header <- input_header("Commodity Change", activity_name, event_year)
-    dat <- dat %>%
-        filter(.data$group == "Comm") %>%
-        arrange(.data$sector) %>%
-        mutate(yr = event_year, loc = 1) %>%
-        select(
-            Sector = .data$sector, `Event Value` = .data$spend,
-            EventYear = .data$yr, Retail = .data$retail,
-            `Local Direct Purchase` = .data$loc
-        )
-    list("header" = header, "dat" = dat)
+    input_prep(dat, activity_name, event_year, "Comm")
 }
 
 # Write Input -------------------------------------------------------------

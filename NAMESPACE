@@ -3,6 +3,7 @@
 export(check_share_sums)
 export(check_spend_sums)
 export(input_header)
+export(input_prep)
 export(input_prep_comm)
 export(input_prep_ind)
 export(sector_update)

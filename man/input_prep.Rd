@@ -6,21 +6,27 @@
 \alias{input_prep_comm}
 \title{Prepare spending by sector for Excel implan import}
 \usage{
+input_prep(dat, activity_name, event_year = 2019, group)
+
 input_prep_ind(dat, activity_name, event_year = 2019)
 
 input_prep_comm(dat, activity_name, event_year = 2019)
 }
 \arguments{
-\item{dat}{data frame with spending by sector}
+\item{dat}{data frame with spending by sector with 4 required columns:
+group ("Ind" or "Comm"), sector (numeric), retail ("Yes" or "No"), spend (numeric)}
 
 \item{activity_name}{Activity Name used for Implan}
 
 \item{event_year}{Activity Year for Implan}
+
+\item{group}{Either "Ind" or "Comm"}
 }
 \description{
 This function splits an input data frame into a list with 2 data frames:
 (1) a sheet header with activity details used by implan, and (2) the
-sector spending with additional columns which implan will calculate
+sector spending with additional columns which implan will calculate. The data
+portion is also grouped by sector-retail to ensure the minimum number of rows.
 }
 \section{Functions}{
 \itemize{
@@ -50,8 +56,9 @@ spend_sector <- spend_category \%>\%
 check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 
 # allocate for implan import (Industry)
-ls <- input_prep_ind(spend_sector, "huntInd")
-ls
+comm <- input_prep_comm(spend_sector, "huntComm")
+ind <- input_prep_ind(spend_sector, "huntInd")
+ind
 
 # write to an excel worksheet
 xlsx_write_implan(ls, "tmp.xlsx")
