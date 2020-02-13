@@ -22,9 +22,11 @@ A dataset containing sector IDs and descriptions prepared from
 }
 \seealso{
 Other data: 
+\code{\link{categories}},
 \code{\link{sector_scheme536}},
 \code{\link{sectors536}},
-\code{\link{sectors_crosswalk}}
+\code{\link{sectors_crosswalk}},
+\code{\link{spending}}
 }
 \concept{data}
 \keyword{datasets}

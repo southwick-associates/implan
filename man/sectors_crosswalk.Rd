@@ -23,9 +23,11 @@ A dataset for relating different Implan sectoring schemes (546 and 536) prepared
 }
 \seealso{
 Other data: 
+\code{\link{categories}},
 \code{\link{sector_scheme536}},
 \code{\link{sectors536}},
-\code{\link{sectors546}}
+\code{\link{sectors546}},
+\code{\link{spending}}
 }
 \concept{data}
 \keyword{datasets}

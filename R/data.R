@@ -62,3 +62,32 @@
 #' }
 #' @family data
 "sector_scheme536"
+
+#' Implan hunting spending categories
+#'
+#' A dataset to relate national survey spending data with implan spending categories
+#' prepared from `system.file("extdata", "implan-categories.xlsx", package = "implan")`
+#'
+#' @format A data frame with 46 rows and 4 columns"
+#' \describe{
+#'   \item{spend_type}{"trip" or "equip"}
+#'   \item{item}{food, lodge, etc.}
+#'   \item{category}{implan spending category}
+#'   \item{share}{category share for item}
+#' }
+#' @family data
+"categories"
+
+#' Implan total hunting spending
+#'
+#' A dataset that defines spending in the format of national survey data prepared
+#' from `system.file("extdata", "spend2019.rds", package = "implan")`
+#'
+#' @format A data frame with 46 rows and 3 columns"
+#' \describe{
+#'   \item{spend_type}{"trip" or "equip"}
+#'   \item{item}{food, lodge, etc.}
+#'   \item{spend}{total spending}
+#' }
+#' @family data
+"spending"

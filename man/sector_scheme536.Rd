@@ -22,9 +22,11 @@ sectors, prepared from `system.file("extdata", "implan-sectors536.xlsx", package
 }
 \seealso{
 Other data: 
+\code{\link{categories}},
 \code{\link{sectors536}},
 \code{\link{sectors546}},
-\code{\link{sectors_crosswalk}}
+\code{\link{sectors_crosswalk}},
+\code{\link{spending}}
 }
 \concept{data}
 \keyword{datasets}

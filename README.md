@@ -16,7 +16,21 @@ remotes::install_github("southwick-associates/implan")
 
 ## Usage
 
-TODO
+TODO: Will add a vignette to provide an example workflow.
+
+```r
+library(implan)
+
+# for updating implan sectoring schemes
+?sector_update()
+
+# for preparing implan Excel input
+?input_prep()
+?input_write()
+
+# for synthesizing implan csv output
+?output_load()
+```
 
 ## Package Development
 
