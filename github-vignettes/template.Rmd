@@ -1,0 +1,25 @@
+---
+output: github_document
+---
+<!-- template.md is generated from template.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dplyr)
+library(implan)
+```
+
+## Overview
+
+Bla di bla
+
+## Section 1
+
+```{r}
+library(dplyr)
+library(implan)
+```
+

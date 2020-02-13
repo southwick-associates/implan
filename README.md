@@ -1,7 +1,7 @@
 
 # implan
 
-A Southwick-only R package to streamline the process of working with Implan. It helps with:
+A Southwick-only R package that streamlines the process of working with Implan. It also provides some convenience functions for writing results to Excel worksheets.
 
 1. Converting spending estimates to spending by implan sector
 2. Writing excel worksheets (Industry/Commercial) to be imported as Implan activities
@@ -20,7 +20,7 @@ See the vignettes:
 
 - Preparing for Implan import & export
 - Updating to a new sectoring scheme 
-- Writing multiple results to one Excel workbook
+- [Writing multiple results to one Excel workbook](github-vignettes/write-excel.md)
 
 ```r
 library(implan)

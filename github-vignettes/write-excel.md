@@ -1,0 +1,73 @@
+
+<!-- write-excel.md is generated from write-excel.Rmd. Please edit that file -->
+
+## Overview
+
+The implan package includes convenience functions for writing to Excel.
+This can be helpful for packaging multiple results (e.g., spending
+profiles) into a single file for easily sharing with colleagues. It uses
+[package openxlsx](https://ycphs.github.io/openxlsx/index.html).
+
+### Initializing
+
+The first step is to create an Excel workbook using
+`xlsx_initialize_workbook()`. This makes an Excel file with a single
+“README” tab. I recommend always including a README as the first tab
+for documentation. It will persist as you add additional tabs that
+include results data.
+
+``` r
+library(dplyr)
+library(implan)
+
+xlsx_initialize_workbook("tmp.xlsx")
+openxlsx::getSheetNames("tmp.xlsx")
+#> [1] "README"
+```
+
+### Adding Results
+
+``` r
+# get some sample data from the implan package
+data(spending)
+head(spending, 2)
+#> # A tibble: 2 x 3
+#>   type  item      spend
+#>   <chr> <chr>     <dbl>
+#> 1 trip  food  14824024.
+#> 2 trip  lodge  3589912.
+
+# write to Excel
+xlsx_write_table(df = spending, tabname = "spending", "tmp.xlsx")
+openxlsx::getSheetNames("tmp.xlsx")
+#> [1] "README"   "spending"
+
+openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
+#>   type  item    spend
+#> 1 trip  food 14824024
+#> 2 trip lodge  3589912
+```
+
+### Updating Results
+
+It’s easy to update existing results stored in Excel worksheets:
+
+``` r
+data(categories)
+head(categories, 2)
+#> # A tibble: 2 x 4
+#>   type  item  category          share
+#>   <chr> <chr> <chr>             <dbl>
+#> 1 trip  food  Food - Restaurant   0.5
+#> 2 trip  food  Food - Groceries    0.5
+
+left_join(spending, categories, by = c("type", "item")) %>%
+    mutate(spend = spend * share) %>%
+    xlsx_write_table("spending", "tmp.xlsx")
+
+spend_category <- openxlsx::readWorkbook("tmp.xlsx", "spending")
+head(spend_category, 2)
+#>   type item   spend          category share
+#> 1 trip food 7412012 Food - Restaurant   0.5
+#> 2 trip food 7412012  Food - Groceries   0.5
+```
