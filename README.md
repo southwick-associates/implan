@@ -26,9 +26,10 @@ library(implan)
 
 # for preparing implan Excel input
 ?input_prep()
-?input_write()
+?xlsx_write_implan()
 
 # for synthesizing implan csv output
+?csv_read_implan()
 ?output_load()
 ```
 

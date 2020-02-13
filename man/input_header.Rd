@@ -14,14 +14,14 @@ input_header(activity_type, activity_name, event_year)
 \item{event_year}{Activity Year for Implan}
 }
 \description{
-This is a convenience function called from \code{\link{input_prepare}}
+This is a convenience function called from \code{\link{input_prep}}
 }
 \examples{
-# see ?input_prepare
+# see ?input_prep
 }
 \seealso{
 Other functions to transfer to/from implan: 
-\code{\link{input_prepare}},
+\code{\link{input_prep}},
 \code{\link{xlsx_initialize_workbook}()},
 \code{\link{xlsx_write_implan}()},
 \code{\link{xlsx_write_table}()}

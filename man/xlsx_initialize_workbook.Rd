@@ -16,7 +16,7 @@ stored in the Excel file.
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},
-\code{\link{input_prepare}},
+\code{\link{input_prep}},
 \code{\link{xlsx_write_implan}()},
 \code{\link{xlsx_write_table}()}
 }

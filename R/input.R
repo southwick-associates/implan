@@ -1,19 +1,19 @@
 # functions to transfer to/from implan
 
-# TODO: add xlsx_write_implan() example to input_prepare
+# TODO: add xlsx_write_implan() example to input_prep
 
 # Prep Input -------------------------------------------------------------------
 
 #' Get a header table for Implan import
 #'
-#' This is a convenience function called from \code{\link{input_prepare}}
+#' This is a convenience function called from \code{\link{input_prep}}
 #'
-#' @inheritParams input_prepare
+#' @inheritParams input_prep
 #' @param activity_type either "Industry Change" or "Commodity Change"
 #' @family functions to transfer to/from implan
 #' @export
 #' @examples
-#' # see ?input_prepare
+#' # see ?input_prep
 input_header <- function(activity_type, activity_name, event_year) {
     tribble(
         ~`Activity Type`, ~`Activity Name`, ~`Activity Level`, ~`Activity Year`,
@@ -30,7 +30,7 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' @param dat data frame with spending by sector
 #' @param activity_name Activity Name used for Implan
 #' @param event_year Activity Year for Implan
-#' @name input_prepare
+#' @name input_prep
 #' @family functions to transfer to/from implan
 #' @examples
 #' # get necessary sectoring
@@ -53,15 +53,15 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 #'
 #' # allocate for implan import (Industry)
-#' ls <- input_prepare_ind(spend_sector, "huntInd")
+#' ls <- input_prep_ind(spend_sector, "huntInd")
 #' ls
 #'
 #' # write to an excel file
 NULL
 
-#' @describeIn input_prepare Prepare industry data
+#' @describeIn input_prep Prepare industry data
 #' @export
-input_prepare_ind <- function(dat, activity_name, event_year = 2019) {
+input_prep_ind <- function(dat, activity_name, event_year = 2019) {
     header <- input_header("Industry Change", activity_name, event_year)
     dat <- dat %>%
         filter(.data$group == "Ind") %>%
@@ -76,9 +76,9 @@ input_prepare_ind <- function(dat, activity_name, event_year = 2019) {
     list("header" = header, "dat" = dat)
 }
 
-#' @describeIn input_prepare Prepare commodity data
+#' @describeIn input_prep Prepare commodity data
 #' @export
-input_prepare_comm <- function(dat, activity_name, event_year = 2019) {
+input_prep_comm <- function(dat, activity_name, event_year = 2019) {
     header <- input_header("Commodity Change", activity_name, event_year)
     dat <- dat %>%
         filter(.data$group == "Comm") %>%
@@ -153,3 +153,10 @@ xlsx_write_implan <- function(ls, xls_out, tabname) {
 }
 
 # Load Output -------------------------------------------------------------
+
+# TODO: will need different versions for various outputs
+
+#' Read Implan CSV output into R data frames
+csv_read_implan <- function() {
+
+}
