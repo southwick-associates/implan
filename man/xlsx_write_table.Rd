@@ -10,6 +10,8 @@ xlsx_write_table(df, tabname, filename)
 \item{df}{data frame to write to the Excel worksheet}
 
 \item{tabname}{name to use for Excel worksheet}
+
+\item{filename}{path where the Excel workbook will be written}
 }
 \description{
 Requires an existing Excel file, preferably created using

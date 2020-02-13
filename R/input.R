@@ -1,5 +1,7 @@
 # functions to transfer to/from implan
 
+# TODO: add xlsx_write_implan() example to input_prepare
+
 # Prep Input -------------------------------------------------------------------
 
 #' Get a header table for Implan import
@@ -77,7 +79,7 @@ input_prepare_ind <- function(dat, activity_name, event_year = 2019) {
 #' @describeIn input_prepare Prepare commodity data
 #' @export
 input_prepare_comm <- function(dat, activity_name, event_year = 2019) {
-    header <- implan_header("Commodity Change", activity_name, event_year)
+    header <- input_header("Commodity Change", activity_name, event_year)
     dat <- dat %>%
         filter(.data$group == "Comm") %>%
         arrange(.data$sector) %>%
@@ -117,6 +119,7 @@ xlsx_initialize_workbook <- function(filename) {
 #'
 #' @param df data frame to write to the Excel worksheet
 #' @param tabname name to use for Excel worksheet
+#' @inheritParams xlsx_initialize_workbook
 #' @family functions to transfer to/from implan
 #' @export
 xlsx_write_table <- function(df, tabname, filename) {
