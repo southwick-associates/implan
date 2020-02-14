@@ -219,9 +219,11 @@ It’s easy to scale-up this operation using a for loop (or `sapply`):
 
 ``` r
 impacts <- list()
-activity_dirs <- list.files(output_dir, full.names = TRUE)
-for (i in activity_dirs) {
-  impacts[[i]] <- output_read_csv(i) %>% output_combine() %>% mutate(activity = i)
+acts <- list.files(output_dir)
+for (i in acts) {
+  impacts[[i]] <- output_read_csv(file.path(output_dir, i)) %>% 
+    output_combine() %>% 
+    mutate(activity = i)
 }
 bind_rows(impacts)
 #> # A tibble: 8 x 8
