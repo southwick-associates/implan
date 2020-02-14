@@ -182,7 +182,7 @@ output_read_csv <- function(dirname) {
     files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
 
     # store tables in a list of data frames
-    # - convenience function for reading csv files
+    # - define convenience function for reading csv files
     read <- function(x, ...) suppressMessages(readr::read_csv(x, ...))
 
     # - the header row (column names) is on row 2
