@@ -13,14 +13,20 @@ The implan package streamlines the steps otherwise done in Excel:
 
 R code can be easily scaled up/down or ported to a new project without
 the manual restructuring needed in Excel. It’s also less error-prone and
-facilitates automated checks/summaries.
+facilitates automated checks/summaries. You can see an example in the
+wild for B4W:
+[implan-input](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/1-implan-input.R),
+[contributions](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/2-contributions.R)
+
+I’ve also included Excel files from the older approach in this package
+(details in [the last section](#excel-approach)).
 
 ## Implan Sector Allocation
 
 Allocating spending to Implan sectors requires 1 or more crosswalk
 tables. The implan package includes example data to demonstrate the
 allocation process. You can use `read_excel` from the [readxl
-package](https://readxl.tidyverse.org/) for data stored in Excel.
+package](https://readxl.tidyverse.org/) if your data is stored in Excel.
 
 ``` r
 library(dplyr)
@@ -35,7 +41,7 @@ head(spending, 2)
 #> 2 trip  lodge  3589912.
 ```
 
-### Categories
+### Item to Category
 
 For the sample data, spending must first be reallocated from the “item”
 level to the “category” level. Spending is specified by 2 dimensions
@@ -76,7 +82,7 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 #> [1] TRUE
 ```
 
-### Sectors
+### Category to Sector
 
 In the same way, allocating to sectors uses a sectoring scheme crosswalk
 (at the `category` dimension):
@@ -152,21 +158,9 @@ openxlsx::getSheetNames("tmp2.xlsx")
 
 ## Read from Implan
 
-Tom has an existing Excel macro-based approach for pulling together
-economic contributions. I’ve included an example here if you want to
-adapt it:
-
-``` r
-filepath <- system.file(
-  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
-)
-file.copy(filepath, "tmp.xlsm") # copy to your working directory
-#> [1] FALSE
-```
-
-With the R approach, rather than copy/pasting into Excel, you’ll save
-output results into csv, where each implan activity should have its own
-folder. Two example activities are included in the sample data:
+From Implan, you’ll save output results into csv files, where each
+Implan activity should have its own folder of results. Two example
+activities are included in this package:
 
 ``` r
 output_dir <- system.file("extdata", "output", package = "implan", mustWork = TRUE)
@@ -174,8 +168,7 @@ list.files(output_dir)
 #> [1] "bike" "hunt"
 ```
 
-Typically, there are five different sets of results that you’ll be
-interested in:
+Typically, you’ll want 5 sets of results:
 
 ``` r
 hunt_dir <- file.path(output_dir, "hunt")
@@ -216,16 +209,15 @@ output_combine(dat)
 #> 4 Total Effect       2469.   95544620.      150651032.   2.83e8  2.04e7 15554404
 ```
 
-And of course, it’s easy to scale-up this operation using for loops or
-apply:
+It’s easy to scale-up this operation using for loops or sapply:
 
 ``` r
+impacts <- list()
 activity_dirs <- list.files(output_dir, full.names = TRUE)
-activity_dirs %>% 
-    sapply(function(x) {   
-        output_read_csv(x) %>% output_combine() %>% mutate(activity = x)   
-    }, simplify = FALSE) %>%
-    bind_rows()
+for (i in activity_dirs) {
+  impacts[[i]] <- output_read_csv(i) %>% output_combine() %>% mutate(activity = i)
+}
+bind_rows(impacts)
 #> # A tibble: 8 x 8
 #>   ImpactType Employment LaborIncome TotalValueAdded Output  FedTax LocalTax
 #>   <chr>           <dbl>       <dbl>           <dbl>  <dbl>   <dbl>    <dbl>
@@ -238,4 +230,29 @@ activity_dirs %>%
 #> 7 Induced E~       425.   21478274.       39058082. 6.75e7 NA            NA
 #> 8 Total Eff~      2469.   95544620.      150651032. 2.83e8  2.04e7 15554404
 #> # ... with 1 more variable: activity <chr>
+```
+
+## Excel Approach
+
+The older approach combines steps 1 & 2 into an Excel workbook. I
+included a basic example in this package (these become much more complex
+when scaling up):
+
+``` r
+filepath <- system.file(
+  "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
+)
+file.copy(filepath, "tmp.xls") # copy to your working directory
+#> [1] FALSE
+```
+
+Step 3 can be accomplished by copy/pasting implan results into an Excel
+sheet and running embedded macros:
+
+``` r
+filepath <- system.file(
+  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
+)
+file.copy(filepath, "tmp.xlsm") # copy to your working directory
+#> [1] FALSE
 ```
