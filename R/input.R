@@ -172,9 +172,83 @@ xlsx_write_implan <- function(ls, xls_out) {
 
 # Load Output -------------------------------------------------------------
 
-# TODO: will need different versions for various outputs
+#' Read Implan CSV output into R data frames for an implan activity
+#'
+#' The filenames in dirname need to include selected activity (for matching). Up
+#' to 5 files will be read: Summary, Fed total, Fed direct, Local total, Local direct.
+#'
+#' @param activity name of implan activity
+#' @param dirname directory name that stores files
+#' @family functions to transfer to/from implan
+#' @export
+output_read_csv <- function(activity, dirname) {
+    # get all csv files matching selected activity
+    all_files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
+    files <- output_match(all_files, activity)
 
-#' Read Implan CSV output into R data frames
-csv_read_implan <- function() {
+    # store tables in a list of data frames
+    read <- function(x, ...) suppressMessages(readr::read_csv(x, ...))
+    dat <- files %>%
+        sapply(function(i) read(i, skip = 1), simplify = FALSE)
+    names(dat) <- files %>%
+        sapply(function(i) read(i, n_max = 1, col_names = FALSE)[1,1])
+    dat
+}
 
+#' A helper function for case insensitive string matching
+#'
+#' @param string string vector to search
+#' @param match matching phrase to look for
+#' @family functions to transfer to/from implan
+#' @export
+output_match <- function(string, match) {
+    match <- tolower(match) # make case insensitive
+    is_match <- tolower(string) %>% stringr::str_detect(match)
+    string[is_match]
+}
+
+#' Combine csv output for an implan activity into one data frame
+#'
+#' Puts summary, tax fed, tax local into a single table (for direct and total)
+#'
+#' @param dat list produced by \code{\link{output_read_csv}}
+#' @family functions to transfer to/from implan
+#' @export
+output_combine <- function(dat) {
+    names(dat) <- tolower(names(dat))
+
+    get_tax <- function(match = "federal", tax_type = "FedTax") {
+        output_match(names(dat), match) %>% sapply(function(x) {
+            impact = stringr::str_detect(x, "direct") %>%
+                ifelse("Direct Effect", "Total Effect")
+            output_format_tax(dat[[x]], impact, tax_type)
+        }, simplify = FALSE) %>% bind_rows()
+    }
+    fed <- get_tax("federal", "FedTax")
+    local <- get_tax("local", "LocalTax")
+    dat[["impact summary"]] %>%
+        left_join(fed, by = "ImpactType") %>%
+        left_join(local, by = "ImpactType")
+}
+
+#' A helper function to format Tax Impact csv files
+#'
+#' This simplifies the tax results to just show sum of taxes by direct/total.
+#' Intended to be called from \code{\link{output_combine}}
+#'
+#' @param df data frame with tax results
+#' @param impact_type either "Direct Effect" or "Total Effect"
+#' @param tax_type either "FedTax" or "LocalTax"
+#' @family functions to transfer to/from implan
+#' @export
+output_format_tax <- function(df, impact_type, tax_type) {
+    strip_dollar <- function(x) {
+        stringr::str_remove_all(x, "\\$") %>% stringr::str_remove_all(",")
+    }
+    total_tax <- tail(df, 1) %>%
+        select(`Employee Compensation`:Corporations) %>%
+        mutate_all(function(x) as.numeric(strip_dollar(x)))
+    out <- tibble(typ = impact_type, tax = sum(total_tax))
+    names(out) <- c("ImpactType", tax_type)
+    out
 }

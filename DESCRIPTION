@@ -11,7 +11,9 @@ License: For Southwick use only
 Depends: R (>= 3.5.0)
 Imports:
     dplyr,
-    openxlsx
+    openxlsx,
+    readr,
+    stringr
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.0.2

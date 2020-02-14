@@ -67,6 +67,10 @@ xlsx_write_implan(ind, "tmp.xlsx")
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},
+\code{\link{output_combine}()},
+\code{\link{output_format_tax}()},
+\code{\link{output_match}()},
+\code{\link{output_read_csv}()},
 \code{\link{xlsx_initialize_workbook}()},
 \code{\link{xlsx_write_implan}()},
 \code{\link{xlsx_write_table}()}
