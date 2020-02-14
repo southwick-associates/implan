@@ -16,7 +16,7 @@ See the vignettes:
 
 - [Implan preparation, import, and export](github-vignettes/implan-transfer.md)
 - [Writing multiple results to one Excel workbook](github-vignettes/write-excel.md)
-- TODO: [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
+- [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
 
 ## Development
 
