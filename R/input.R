@@ -219,8 +219,10 @@ output_combine <- function(dat) {
 
     get_tax <- function(match = "federal", tax_type = "FedTax") {
         output_match(names(dat), match) %>% sapply(function(x) {
-            impact = stringr::str_detect(x, "direct") %>%
-                ifelse("Direct Effect", "Total Effect")
+            impact = ifelse(
+                stringr::str_detect(x, "direct"),
+                "Direct Effect", "Total Effect"
+            )
             output_format_tax(dat[[x]], impact, tax_type)
         }, simplify = FALSE) %>% bind_rows()
     }
@@ -246,9 +248,9 @@ output_format_tax <- function(df, impact_type, tax_type) {
         stringr::str_remove_all(x, "\\$") %>% stringr::str_remove_all(",")
     }
     total_tax <- tail(df, 1) %>%
-        select(`Employee Compensation`:Corporations) %>%
+        select(.data$`Employee Compensation`:.data$Corporations) %>%
         mutate_all(function(x) as.numeric(strip_dollar(x)))
-    out <- tibble(typ = impact_type, tax = sum(total_tax))
+    out <- tibble(impact_type, sum(total_tax))
     names(out) <- c("ImpactType", tax_type)
     out
 }
