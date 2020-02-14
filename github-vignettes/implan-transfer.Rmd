@@ -18,7 +18,7 @@ The implan package streamlines the steps otherwise done in Excel:
 
 1. [Allocate spending by Implan sector](#implan-sector-allocation)
 2. [Write Excel tabs for Implan import](#write-to-excel)
-3. [Pull all Implan output (csv) into one table](#read-from-csv)
+3. [Pull all Implan output (csv) into one table](#read-from-implan)
 
 ### Elevator Pitch
 
@@ -113,13 +113,23 @@ for (i in c("trip", "equip")) {
 openxlsx::getSheetNames("tmp2.xlsx")
 ```
 
-## Read from CSV
+## Read from Implan
 
-TODO: Probably include some CSVs as external data (e.g., bike, hunt, or something)
-
-- Not hugely different from Tom's Excel macro-based template
+Tom has an existing Excel macro-based approach for pulling together economic contributions. I've included an example here if you want to adapt it:
 
 ```{r}
-
+filepath <- system.file(
+  "extdata", "template", "implan-output.xlsm", package = "implan", mustWork = TRUE
+)
+file.copy(filepath, "tmp.xlsm")
 ```
+
+I've written R functions that use a slightly different approach. Rather than copy/pasting into Excel, you'll save output results into csv. There are typically 5 results sets of interest, and examples are included here:
+
+```{r}
+output <- system.file("extdata", "output", "hunt", package = "implan", mustWork = TRUE)
+list.files(output)
+```
+
+### 
 
