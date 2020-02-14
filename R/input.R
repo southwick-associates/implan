@@ -174,49 +174,42 @@ xlsx_write_implan <- function(ls, xls_out) {
 
 #' Read Implan CSV output into R data frames for an implan activity
 #'
-#' The filenames in dirname need to include selected activity (for matching). Up
-#' to 5 files will be read: Summary, Fed total, Fed direct, Local total, Local direct.
-#'
-#' @param activity name of implan activity
-#' @param dirname directory name that stores files
+#' @param dirname directory name that stores files for selected activity
 #' @family functions to transfer to/from implan
 #' @export
-output_read_csv <- function(activity, dirname) {
-    # get all csv files matching selected activity
-    all_files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
-    files <- output_match(all_files, activity)
+output_read_csv <- function(dirname) {
+    # we only want csv files
+    files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
 
     # store tables in a list of data frames
+    # - convenience function for reading csv files
     read <- function(x, ...) suppressMessages(readr::read_csv(x, ...))
+
+    # - the header row (column names) is on row 2
     dat <- files %>%
         sapply(function(i) read(i, skip = 1), simplify = FALSE)
-    names(dat) <- files %>%
-        sapply(function(i) read(i, n_max = 1, col_names = FALSE)[1,1])
-    dat
-}
 
-#' A helper function for case insensitive string matching
-#'
-#' @param string string vector to search
-#' @param match matching phrase to look for
-#' @family functions to transfer to/from implan
-#' @export
-output_match <- function(string, match) {
-    match <- tolower(match) # make case insensitive
-    is_match <- tolower(string) %>% stringr::str_detect(match)
-    string[is_match]
+    # - there is a title row that holds the table name
+    names(dat) <- files %>%
+        sapply(function(i) read(i, n_max = 1, col_names = FALSE)[1,1]) %>%
+        tolower()
+    dat
 }
 
 #' Combine csv output for an implan activity into one data frame
 #'
-#' Puts summary, tax fed, tax local into a single table (for direct and total)
+#' Puts summary, tax fed, and tax local into a single table
 #'
 #' @param dat list produced by \code{\link{output_read_csv}}
 #' @family functions to transfer to/from implan
 #' @export
 output_combine <- function(dat) {
-    names(dat) <- tolower(names(dat))
-
+    # define helper function for string matching
+    output_match <- function(string, match) {
+        is_match <- stringr::str_detect(string, match)
+        string[is_match]
+    }
+    # define function to run federal and state/local separately
     get_tax <- function(match = "federal", tax_type = "FedTax") {
         output_match(names(dat), match) %>% sapply(function(x) {
             impact = ifelse(

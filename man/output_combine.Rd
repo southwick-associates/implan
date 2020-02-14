@@ -10,14 +10,13 @@ output_combine(dat)
 \item{dat}{list produced by \code{\link{output_read_csv}}}
 }
 \description{
-Puts summary, tax fed, tax local into a single table (for direct and total)
+Puts summary, tax fed, and tax local into a single table
 }
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},
 \code{\link{input_prep}()},
 \code{\link{output_format_tax}()},
-\code{\link{output_match}()},
 \code{\link{output_read_csv}()},
 \code{\link{xlsx_initialize_workbook}()},
 \code{\link{xlsx_write_implan}()},

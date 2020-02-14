@@ -4,16 +4,13 @@
 \alias{output_read_csv}
 \title{Read Implan CSV output into R data frames for an implan activity}
 \usage{
-output_read_csv(activity, dirname)
+output_read_csv(dirname)
 }
 \arguments{
-\item{activity}{name of implan activity}
-
-\item{dirname}{directory name that stores files}
+\item{dirname}{directory name that stores files for selected activity}
 }
 \description{
-The filenames in dirname need to include selected activity (for matching). Up
-to 5 files will be read: Summary, Fed total, Fed direct, Local total, Local direct.
+Read Implan CSV output into R data frames for an implan activity
 }
 \seealso{
 Other functions to transfer to/from implan: 
@@ -21,7 +18,6 @@ Other functions to transfer to/from implan:
 \code{\link{input_prep}()},
 \code{\link{output_combine}()},
 \code{\link{output_format_tax}()},
-\code{\link{output_match}()},
 \code{\link{xlsx_initialize_workbook}()},
 \code{\link{xlsx_write_implan}()},
 \code{\link{xlsx_write_table}()}

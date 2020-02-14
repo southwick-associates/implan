@@ -115,6 +115,10 @@ openxlsx::getSheetNames("tmp2.xlsx")
 
 ## Read from CSV
 
+TODO: Probably include some CSVs as external data (e.g., bike, hunt, or something)
+
+- Not hugely different from Tom's Excel macro-based template
+
 ```{r}
 
 ```
