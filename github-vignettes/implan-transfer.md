@@ -7,7 +7,7 @@ The implan package streamlines the steps otherwise done in Excel:
 
 1.  [Allocate spending by Implan sector](#implan-sector-allocation)
 2.  [Write Excel tabs for Implan import](#write-to-excel)
-3.  [Pull all Implan output (csv) into one table](#read-from-csv)
+3.  [Pull all Implan output (csv) into one table](#read-from-implan)
 
 ### Elevator Pitch
 
@@ -150,4 +150,92 @@ openxlsx::getSheetNames("tmp2.xlsx")
 #> [1] "README"    "tripInd"   "tripComm"  "equipInd"  "equipComm"
 ```
 
-## Read from CSV
+## Read from Implan
+
+Tom has an existing Excel macro-based approach for pulling together
+economic contributions. I’ve included an example here if you want to
+adapt it:
+
+``` r
+filepath <- system.file(
+  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
+)
+file.copy(filepath, "tmp.xlsm") # copy to your working directory
+#> [1] FALSE
+```
+
+With the R approach, rather than copy/pasting into Excel, you’ll save
+output results into csv, where each implan activity should have its own
+folder. Two example activities are included in the sample data:
+
+``` r
+output_dir <- system.file("extdata", "output", package = "implan", mustWork = TRUE)
+list.files(output_dir)
+#> [1] "bike" "hunt"
+```
+
+Typically, there are five different sets of results that you’ll be
+interested in:
+
+``` r
+hunt_dir <- file.path(output_dir, "hunt")
+list.files(hunt_dir)
+#> [1] "B4W_ColoradoModel Federal Tax Impact by Direct.csv"        
+#> [2] "B4W_ColoradoModel Federal Tax Impact by Total.csv"         
+#> [3] "B4W_ColoradoModel hunt  Impact Summary.csv"                
+#> [4] "B4W_ColoradoModel State and Local Tax Impact by Direct.csv"
+#> [5] "B4W_ColoradoModel State and Local Tax Impact by Total.csv"
+```
+
+### Get CSV Files
+
+The `output_read_csv()` function is included to pull all implan output
+csv files into an R list:
+
+``` r
+dat <- output_read_csv(hunt_dir)
+names(dat)
+#> [1] "federal tax impact by direct"        
+#> [2] "federal tax impact by total"         
+#> [3] "impact summary"                      
+#> [4] "state and local tax impact by direct"
+#> [5] "state and local tax impact by total"
+```
+
+You can then combine these results into a single table with
+`output_combine()`:
+
+``` r
+output_combine(dat)
+#> # A tibble: 4 x 7
+#>   ImpactType    Employment LaborIncome TotalValueAdded   Output  FedTax LocalTax
+#>   <chr>              <dbl>       <dbl>           <dbl>    <dbl>   <dbl>    <dbl>
+#> 1 Direct Effect      1694.   51488607.       77127905.   1.48e8  1.10e7  9377690
+#> 2 Indirect Eff~       351.   22577739.       34465045.   6.75e7 NA            NA
+#> 3 Induced Effe~       425.   21478274.       39058082.   6.75e7 NA            NA
+#> 4 Total Effect       2469.   95544620.      150651032.   2.83e8  2.04e7 15554404
+```
+
+And of course, it’s easy to scale-up this operation using for loops or
+apply:
+
+``` r
+activity_dirs <- list.files(output_dir, full.names = TRUE)
+activity_dirs %>% 
+    sapply(function(x) {   
+        output_read_csv(x) %>% output_combine() %>% mutate(activity = x)   
+    }, simplify = FALSE) %>%
+    bind_rows()
+#> # A tibble: 8 x 8
+#>   ImpactType Employment LaborIncome TotalValueAdded Output  FedTax LocalTax
+#>   <chr>           <dbl>       <dbl>           <dbl>  <dbl>   <dbl>    <dbl>
+#> 1 Direct Ef~      2893.  113060079.      185259583. 3.41e8  2.61e7 31961988
+#> 2 Indirect ~       808.   54793181.       82309563. 1.60e8 NA            NA
+#> 3 Induced E~       962.   48677587.       88529239. 1.53e8 NA            NA
+#> 4 Total Eff~      4663.  216530848.      356098385. 6.54e8  4.81e7 46878467
+#> 5 Direct Ef~      1694.   51488607.       77127905. 1.48e8  1.10e7  9377690
+#> 6 Indirect ~       351.   22577739.       34465045. 6.75e7 NA            NA
+#> 7 Induced E~       425.   21478274.       39058082. 6.75e7 NA            NA
+#> 8 Total Eff~      2469.   95544620.      150651032. 2.83e8  2.04e7 15554404
+#> # ... with 1 more variable: activity <chr>
+```

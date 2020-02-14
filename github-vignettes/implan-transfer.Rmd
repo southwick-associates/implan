@@ -24,6 +24,13 @@ The implan package streamlines the steps otherwise done in Excel:
 
 R code can be easily scaled up/down or ported to a new project without the manual restructuring needed in Excel. It's also less error-prone and facilitates automated checks/summaries.
 
+The non-R approach incorporates steps 1 & 2 in an Excel workbook. I included a basic example in this package (these become far more complex when scaling up):
+
+```{r}
+
+```
+
+
 ## Implan Sector Allocation
 
 Allocating spending to Implan sectors requires 1 or more crosswalk tables. The implan package includes example data to demonstrate the allocation process. You can use `read_excel` from the [readxl package](https://readxl.tidyverse.org/) for data stored in Excel.
@@ -119,17 +126,48 @@ Tom has an existing Excel macro-based approach for pulling together economic con
 
 ```{r}
 filepath <- system.file(
-  "extdata", "template", "implan-output.xlsm", package = "implan", mustWork = TRUE
+  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
 )
-file.copy(filepath, "tmp.xlsm")
+file.copy(filepath, "tmp.xlsm") # copy to your working directory
 ```
 
-I've written R functions that use a slightly different approach. Rather than copy/pasting into Excel, you'll save output results into csv. There are typically 5 results sets of interest, and examples are included here:
+With the R approach, rather than copy/pasting into Excel, you'll save output results into csv, where each implan activity should have its own folder. Two example activities are included in the sample data:
 
 ```{r}
-output <- system.file("extdata", "output", "hunt", package = "implan", mustWork = TRUE)
-list.files(output)
+output_dir <- system.file("extdata", "output", package = "implan", mustWork = TRUE)
+list.files(output_dir)
 ```
 
-### 
+Typically, there are five different sets of results that you'll be interested in:
+
+```{r}
+hunt_dir <- file.path(output_dir, "hunt")
+list.files(hunt_dir)
+```
+
+### Get CSV Files
+
+The `output_read_csv()` function is included to pull all implan output csv files into an R list:
+
+```{r}
+dat <- output_read_csv(hunt_dir)
+names(dat)
+```
+
+You can then combine these results into a single table with `output_combine()`:
+
+```{r}
+output_combine(dat)
+```
+
+It's easy to scale-up this operation using for loops or sapply:
+
+```{r}
+impacts <- list()
+activity_dirs <- list.files(output_dir, full.names = TRUE)
+for (i in activity_dirs) {
+  impacts[[i]] <- output_read_csv(i) %>% output_combine() %>% mutate(activity = i)
+}
+bind_rows(impacts)
+```
 
