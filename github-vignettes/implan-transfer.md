@@ -3,7 +3,7 @@
 
 ## Overview
 
-The implan package streamlines the steps otherwise done in Excel:
+The implan package streamlines several steps otherwise done in Excel:
 
 1.  [Allocate spending by Implan sector](#implan-sector-allocation)
 2.  [Write Excel tabs for Implan import](#write-to-excel)
@@ -25,20 +25,28 @@ I’ve also included Excel files from the older approach in this package
 
 Allocating spending to Implan sectors requires 1 or more crosswalk
 tables. The implan package includes example data to demonstrate the
-allocation process. You can use `read_excel` from the [readxl
-package](https://readxl.tidyverse.org/) if your data is stored in Excel.
+allocation process.
 
 ``` r
 library(dplyr)
 library(implan)
 
 data(spending) # total hunting spending by item
-head(spending, 2)
-#> # A tibble: 2 x 3
-#>   type  item      spend
-#>   <chr> <chr>     <dbl>
-#> 1 trip  food  14824024.
-#> 2 trip  lodge  3589912.
+spending
+#> # A tibble: 44 x 3
+#>    type  item          spend
+#>    <chr> <chr>         <dbl>
+#>  1 trip  food      14824024.
+#>  2 trip  lodge      3589912.
+#>  3 trip  plane       703034.
+#>  4 trip  pubtrans    438757.
+#>  5 trip  privtrans 17689308.
+#>  6 trip  guide      3893594.
+#>  7 trip  publand     109853.
+#>  8 trip  privland  10726392.
+#>  9 trip  heat        610683.
+#> 10 trip  rent       1209743.
+#> # ... with 34 more rows
 ```
 
 ### Item to Category

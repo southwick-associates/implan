@@ -28,14 +28,14 @@ Update sectoring scheme with crosswalk table
 }
 \examples{
 # load sample data
-data(sector_scheme536, sectors_crosswalk, sectors546)
+data(category_to_sector536, sector536_to_sector546, sectors546)
 
 # check the sector allocation for the 536 sector scheme (should be TRUE)
-check_share_sums(sector_scheme536, share, category)
+check_share_sums(category_to_sector536, share, category)
 
 # update to 546 sector scheme and check
-sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, sectors546)
-check_share_sums(sector_scheme546, share, category)
+category_to_sector546 <- sector_update(category_to_sector536, sector536_to_sector546, sectors546)
+check_share_sums(category_to_sector546, share, category)
 }
 \seealso{
 Other functions to get spending by implan sector: 

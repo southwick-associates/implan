@@ -44,7 +44,7 @@
 #' }
 #' @source \url{https://implanhelp.zendesk.com/hc/en-us/articles/360034895094-BEA-Benchmark-The-New-546-Sectoring-Scheme}
 #' @family data
-"sectors_crosswalk"
+"sector536_to_sector546"
 
 #' Implan sectoring scheme (536) for hunting
 #'
@@ -61,7 +61,7 @@
 #'   \item{retail}{"Yes" or "No"}
 #' }
 #' @family data
-"sector_scheme536"
+"category_to_sector536"
 
 #' Implan sectoring scheme (546) for hunting
 #'
@@ -77,9 +77,9 @@
 #'   \item{retail}{"Yes" or "No"}
 #' }
 #' @family data
-"sector_scheme546"
+"category_to_sector546"
 
-#' Implan hunting spending categories
+#' Implan hunting item to category crosswalk
 #'
 #' A dataset to relate national survey spending data with implan spending categories
 #' prepared from `system.file("extdata", "implan-categories.xlsx", package = "implan")`
@@ -92,7 +92,7 @@
 #'   \item{share}{category share for item}
 #' }
 #' @family data
-"categories"
+"item_to_category"
 
 #' Implan total hunting spending
 #'

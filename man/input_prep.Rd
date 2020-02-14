@@ -37,21 +37,21 @@ portion is also grouped by sector-retail to ensure the minimum number of rows.
 
 \examples{
 # get necessary sectoring
-data(sector_scheme536, sectors_crosswalk, sectors546)
-sector_scheme546 <- sector_update(sector_scheme536, sectors_crosswalk, sectors546)
+data(category_to_sector536, sector536_to_sector546, sectors546)
+category_to_sector546 <- sector_update(category_to_sector536, sector536_to_sector546, sectors546)
 
 # calculate total spending by sector
 library(dplyr)
-data(spending, categories)
+data(spending, item_to_category)
 
 spend_category <- spending \%>\%
-    left_join(categories, by = c("type", "item")) \%>\%
+    left_join(item_to_category, by = c("type", "item")) \%>\%
     mutate(spend = spend * share)
 check_spend_sums(spending, spend_category, spend, type, item)
 
 spend_sector <- spend_category \%>\%
     select(-share) \%>\%
-    left_join(sector_scheme546, by = "category") \%>\%
+    left_join(category_to_sector546, by = "category") \%>\%
     mutate(spend = spend * share)
 check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 

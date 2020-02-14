@@ -14,7 +14,7 @@ library(implan)
 
 ## Overview
 
-The implan package streamlines the steps otherwise done in Excel:
+The implan package streamlines several steps otherwise done in Excel:
 
 1. [Allocate spending by Implan sector](#implan-sector-allocation)
 2. [Write Excel tabs for Implan import](#write-to-excel)
@@ -28,14 +28,14 @@ I've also included Excel files from the older approach in this package (details 
 
 ## Implan Sector Allocation
 
-Allocating spending to Implan sectors requires 1 or more crosswalk tables. The implan package includes example data to demonstrate the allocation process. You can use `read_excel` from the [readxl package](https://readxl.tidyverse.org/) if your data is stored in Excel.
+Allocating spending to Implan sectors requires 1 or more crosswalk tables. The implan package includes example data to demonstrate the allocation process:
 
 ```{r}
 library(dplyr)
 library(implan)
 
 data(spending) # total hunting spending by item
-head(spending, 2)
+spending
 ```
 
 ### Item to Category
@@ -43,18 +43,18 @@ head(spending, 2)
 For the sample data, spending must first be reallocated from the "item" level to the "category" level. Spending is specified by 2 dimensions (`type`, `item`) for which `share` must sum to 100%:
 
 ```{r}
-data(categories) # item-category crosswalk
-head(categories, 2)
+data(item_to_category) # item-category crosswalk
+head(item_to_category, 2)
 
 # check the share variable - should print "TRUE"
-check_share_sums(df = categories, sharevar = share, type, item)
+check_share_sums(df = item_to_category, sharevar = share, type, item)
 ```
 
 Allocating is a simple matter of joining with the crosswalk table and multiplying:
 
 ```{r}
 spend_category <- spending %>%
-    left_join(categories, by = c("type", "item")) %>%
+    left_join(item_to_category, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
     select(-share) # no longer needed
 
@@ -66,16 +66,16 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 
 ### Category to Sector
 
-In the same way, allocating to sectors uses a sectoring scheme crosswalk (at the `category` dimension):
+In the same way, allocating to sectors uses a crosswalk (at the `category` dimension):
 
 ```{r}
-data(sector_scheme546) # category-sector crosswalk
-head(sector_scheme546, 2)
+data(category_to_sector546) # category-sector crosswalk
+head(category_to_sector546, 2)
 
-check_share_sums(sector_scheme546, sharevar = share, category)
+check_share_sums(category_to_sector546, sharevar = share, category)
 
 spend_sector <- spend_category %>%
-    left_join(sector_scheme546, by = "category") %>%
+    left_join(category_to_sector546, by = "category") %>%
     mutate(spend = spend * share)
 
 check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spend, category)
@@ -83,13 +83,12 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## Write to Excel
 
-A preparation step is needed to convert spending by sector to the Industry/Commercial format that the Implan import requires:
+We must first convert spending by sector to the necessary Industry/Commercial format. Each destination Excel tab requires a header table and a data table: 
 
 ```{r}
 ind <- input_prep_ind(spend_sector, "huntInd")
 comm <- input_prep_comm(spend_sector, "huntComm")
 
-# 2 tables are needed for each Excel tab
 comm$header
 
 head(comm$dat, 2)
@@ -117,14 +116,14 @@ openxlsx::getSheetNames("tmp2.xlsx")
 
 ## Read from Implan
 
-From Implan, you'll save output results into csv files, where each Implan activity should have its own folder of results. Two example activities are included in this package:
+From Implan, you'll need to save output results into csv files, where each Implan activity should have its own folder of results. Two example activities are included in this package:
 
 ```{r}
 output_dir <- system.file("extdata", "output", package = "implan", mustWork = TRUE)
 list.files(output_dir)
 ```
 
-Typically, you'll want 5 sets of results:
+Typically, you'll want 5 sets of results per activity:
 
 ```{r}
 hunt_dir <- file.path(output_dir, "hunt")
@@ -133,7 +132,7 @@ list.files(hunt_dir)
 
 ### Get CSV Files
 
-The `output_read_csv()` function is included to pull all implan output csv files into an R list:
+The `output_read_csv()` function pulls all csv files for an activity into an R list:
 
 ```{r}
 dat <- output_read_csv(hunt_dir)
@@ -146,7 +145,7 @@ You can then combine these results into a single table with `output_combine()`:
 output_combine(dat)
 ```
 
-It's easy to scale-up this operation using for loops or sapply:
+It's easy to scale-up this operation using a for loop (or `sapply`):
 
 ```{r}
 impacts <- list()

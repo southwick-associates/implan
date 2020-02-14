@@ -1,7 +1,7 @@
 Package: implan
 Type: Package
 Title: Work with Implan Data
-Version: 0.2.0
+Version: 0.3.0
 Author: Dan Kary
 Maintainer: Dan Kary <dan@southwickassociates.com>
 Description: Spending needs to be translated into Implan sectors, and saved
