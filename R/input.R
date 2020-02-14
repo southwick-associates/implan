@@ -177,6 +177,11 @@ xlsx_write_implan <- function(ls, xls_out) {
 #' @param dirname directory name that stores files for selected activity
 #' @family functions to transfer to/from implan
 #' @export
+#' @examples
+#' output_dir <- system.file("extdata", "output", package = "implan")
+#' hunt_dir <- file.path(output_dir, "hunt")
+#' dat <- output_read_csv(hunt_dir)
+#' output_combine(dat)
 output_read_csv <- function(dirname) {
     # we only want csv files
     files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
@@ -203,6 +208,8 @@ output_read_csv <- function(dirname) {
 #' @param dat list produced by \code{\link{output_read_csv}}
 #' @family functions to transfer to/from implan
 #' @export
+#' @examples
+#' # see ?output_read_csv()
 output_combine <- function(dat) {
     # define helper function for string matching
     output_match <- function(string, match) {

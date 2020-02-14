@@ -12,6 +12,9 @@ output_combine(dat)
 \description{
 Puts summary, tax fed, and tax local into a single table
 }
+\examples{
+# see ?output_read_csv()
+}
 \seealso{
 Other functions to transfer to/from implan: 
 \code{\link{input_header}()},

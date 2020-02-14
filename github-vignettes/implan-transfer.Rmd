@@ -43,7 +43,7 @@ spending
 For the sample data, spending must first be reallocated from the "item" level to the "category" level. Spending is specified by 2 dimensions (`type`, `item`) for which `share` must sum to 100%:
 
 ```{r}
-data(item_to_category) # item-category crosswalk
+data(item_to_category)
 head(item_to_category, 2)
 
 # check the share variable - should print "TRUE"
@@ -69,7 +69,7 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 In the same way, allocating to sectors uses a crosswalk (at the `category` dimension):
 
 ```{r}
-data(category_to_sector546) # category-sector crosswalk
+data(category_to_sector546)
 head(category_to_sector546, 2)
 
 check_share_sums(category_to_sector546, sharevar = share, category)
@@ -83,7 +83,7 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## Write to Excel
 
-We must first convert spending by sector to the necessary Industry/Commercial format. Each destination Excel tab requires a header table and a data table: 
+We must first convert spending by sector to the necessary Industry/Commercial format. Each destination Excel tab requires 2 tables (header & data):
 
 ```{r}
 ind <- input_prep_ind(spend_sector, "huntInd")

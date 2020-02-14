@@ -25,7 +25,7 @@ I’ve also included Excel files from the older approach in this package
 
 Allocating spending to Implan sectors requires 1 or more crosswalk
 tables. The implan package includes example data to demonstrate the
-allocation process.
+allocation process:
 
 ``` r
 library(dplyr)
@@ -56,8 +56,8 @@ level to the “category” level. Spending is specified by 2 dimensions
 (`type`, `item`) for which `share` must sum to 100%:
 
 ``` r
-data(categories) # item-category crosswalk
-head(categories, 2)
+data(item_to_category)
+head(item_to_category, 2)
 #> # A tibble: 2 x 4
 #>   type  item  category          share
 #>   <chr> <chr> <chr>             <dbl>
@@ -65,7 +65,7 @@ head(categories, 2)
 #> 2 trip  food  Food - Groceries    0.5
 
 # check the share variable - should print "TRUE"
-check_share_sums(df = categories, sharevar = share, type, item)
+check_share_sums(df = item_to_category, sharevar = share, type, item)
 #> [1] TRUE
 ```
 
@@ -74,7 +74,7 @@ multiplying:
 
 ``` r
 spend_category <- spending %>%
-    left_join(categories, by = c("type", "item")) %>%
+    left_join(item_to_category, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
     select(-share) # no longer needed
 
@@ -92,23 +92,23 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 
 ### Category to Sector
 
-In the same way, allocating to sectors uses a sectoring scheme crosswalk
-(at the `category` dimension):
+In the same way, allocating to sectors uses a crosswalk (at the
+`category` dimension):
 
 ``` r
-data(sector_scheme546) # category-sector crosswalk
-head(sector_scheme546, 2)
+data(category_to_sector546)
+head(category_to_sector546, 2)
 #> # A tibble: 2 x 6
 #>   group category sector description                       share retail
 #>   <chr> <chr>     <dbl> <chr>                             <dbl> <chr> 
 #> 1 Comm  Ammo       3255 Small arms ammunition             0.325 Yes   
 #> 2 Comm  Ammo       3256 Ammunition, except for small arms 0.675 Yes
 
-check_share_sums(sector_scheme546, sharevar = share, category)
+check_share_sums(category_to_sector546, sharevar = share, category)
 #> [1] TRUE
 
 spend_sector <- spend_category %>%
-    left_join(sector_scheme546, by = "category") %>%
+    left_join(category_to_sector546, by = "category") %>%
     mutate(spend = spend * share)
 
 check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spend, category)
@@ -117,14 +117,14 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## Write to Excel
 
-A preparation step is needed to convert spending by sector to the
-Industry/Commercial format that the Implan import requires:
+We must first convert spending by sector to the necessary
+Industry/Commercial format. Each destination Excel tab requires 2 tables
+(header & data):
 
 ``` r
 ind <- input_prep_ind(spend_sector, "huntInd")
 comm <- input_prep_comm(spend_sector, "huntComm")
 
-# 2 tables are needed for each Excel tab
 comm$header
 #> # A tibble: 1 x 4
 #>   `Activity Type`  `Activity Name` `Activity Level` `Activity Year`
@@ -166,8 +166,8 @@ openxlsx::getSheetNames("tmp2.xlsx")
 
 ## Read from Implan
 
-From Implan, you’ll save output results into csv files, where each
-Implan activity should have its own folder of results. Two example
+From Implan, you’ll need to save output results into csv files, where
+each Implan activity should have its own folder of results. Two example
 activities are included in this package:
 
 ``` r
@@ -176,31 +176,29 @@ list.files(output_dir)
 #> [1] "bike" "hunt"
 ```
 
-Typically, you’ll want 5 sets of results:
+Typically, you’ll want 5 sets of results per activity:
 
 ``` r
 hunt_dir <- file.path(output_dir, "hunt")
 list.files(hunt_dir)
-#> [1] "B4W_ColoradoModel Federal Tax Impact by Direct.csv"        
-#> [2] "B4W_ColoradoModel Federal Tax Impact by Total.csv"         
-#> [3] "B4W_ColoradoModel hunt  Impact Summary.csv"                
-#> [4] "B4W_ColoradoModel State and Local Tax Impact by Direct.csv"
-#> [5] "B4W_ColoradoModel State and Local Tax Impact by Total.csv"
+#> [1] "B4W_ColoradoModelFedDirect.csv"   "B4W_ColoradoModelFedTotal.csv"   
+#> [3] "B4W_ColoradoModelStateDirect.csv" "B4W_ColoradoModelStateTotal.csv" 
+#> [5] "B4W_ColoradoModelSummary.csv"
 ```
 
 ### Get CSV Files
 
-The `output_read_csv()` function is included to pull all implan output
-csv files into an R list:
+The `output_read_csv()` function pulls all csv files for an activity
+into an R list:
 
 ``` r
 dat <- output_read_csv(hunt_dir)
 names(dat)
 #> [1] "federal tax impact by direct"        
 #> [2] "federal tax impact by total"         
-#> [3] "impact summary"                      
-#> [4] "state and local tax impact by direct"
-#> [5] "state and local tax impact by total"
+#> [3] "state and local tax impact by direct"
+#> [4] "state and local tax impact by total" 
+#> [5] "impact summary"
 ```
 
 You can then combine these results into a single table with
@@ -217,7 +215,7 @@ output_combine(dat)
 #> 4 Total Effect       2469.   95544620.      150651032.   2.83e8  2.04e7 15554404
 ```
 
-It’s easy to scale-up this operation using for loops or sapply:
+It’s easy to scale-up this operation using a for loop (or `sapply`):
 
 ``` r
 impacts <- list()
@@ -251,7 +249,7 @@ filepath <- system.file(
   "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xls") # copy to your working directory
-#> [1] FALSE
+#> [1] TRUE
 ```
 
 Step 3 can be accomplished by copy/pasting implan results into an Excel
@@ -262,5 +260,5 @@ filepath <- system.file(
   "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xlsm") # copy to your working directory
-#> [1] FALSE
+#> [1] TRUE
 ```
