@@ -23,6 +23,30 @@ I’ve also included Excel files from the older approach in this package
 
 ## Implan Sector Allocation
 
+### TODO: Explain in a more informative way
+
+1.  Discuss sectoring schemes (category-to-sector) and how these:
+
+<!-- end list -->
+
+  - probably won’t vary by project (unless need categories need to be
+    added)
+  - the categories define the target for the item-to-category crosswalk
+  - include the check\_share\_sums (TRUE if sums to 100%)
+
+<!-- end list -->
+
+2.  Discuss item-category crosswalk:
+
+<!-- end list -->
+
+  - this may need to be constructed by hand, unless an item-breakout
+    from an existing projects (e.g., OIA) is used
+
+<!-- end list -->
+
+3.  Allocate (this is simple)
+
 Allocating spending to Implan sectors requires 1 or more crosswalk
 tables. The implan package includes example data to demonstrate the
 allocation process:
@@ -118,7 +142,7 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 ## Write to Excel
 
 We must first convert spending by sector to the necessary
-Industry/Commercial format. Each destination Excel tab requires 2 tables
+Industry/Commodity format. Each destination Excel tab requires 2 tables
 (header & data):
 
 ``` r
@@ -251,7 +275,7 @@ filepath <- system.file(
   "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xls") # copy to your working directory
-#> [1] TRUE
+#> [1] FALSE
 ```
 
 Step 3 can be accomplished by copy/pasting implan results into an Excel
@@ -262,5 +286,5 @@ filepath <- system.file(
   "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xlsm") # copy to your working directory
-#> [1] TRUE
+#> [1] FALSE
 ```

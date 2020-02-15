@@ -28,6 +28,16 @@ I've also included Excel files from the older approach in this package (details 
 
 ## Implan Sector Allocation
 
+### TODO: Explain in a more informative way
+
+1. Discuss sectoring schemes (category-to-sector) and how these:
+  + probably won't vary by project (unless need categories need to be added)
+  + the categories define the target for the item-to-category crosswalk
+  + include the check_share_sums (TRUE if sums to 100%)
+2. Discuss item-category crosswalk:
+  + this may need to be constructed by hand, unless an item-breakout from an existing projects (e.g., OIA) is used
+3. Allocate (this is simple)
+
 Allocating spending to Implan sectors requires 1 or more crosswalk tables. The implan package includes example data to demonstrate the allocation process:
 
 ```{r}
@@ -83,7 +93,7 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## Write to Excel
 
-We must first convert spending by sector to the necessary Industry/Commercial format. Each destination Excel tab requires 2 tables (header & data):
+We must first convert spending by sector to the necessary Industry/Commodity format. Each destination Excel tab requires 2 tables (header & data):
 
 ```{r}
 ind <- input_prep_ind(spend_sector, "huntInd")
