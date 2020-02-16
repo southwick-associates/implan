@@ -37,7 +37,7 @@ R data frames can be written directly to an Excel file with `xlsx_write_table()`
 data(spending)
 head(spending, 2)
 
-xlsx_write_table(spending, "spending", "tmp.xlsx")
+xlsx_write_table(spending, "tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
 ```
 
@@ -50,7 +50,7 @@ Additional calls to `xlsx_write_table()` will simply overwrite tabs with the sam
 data(categories) 
 left_join(spending, categories, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
-    xlsx_write_table("spending", "tmp.xlsx")
+    xlsx_write_table("tmp.xlsx", "spending")
 
 openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
 ```

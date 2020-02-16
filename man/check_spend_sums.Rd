@@ -19,7 +19,7 @@ check_spend_sums(df_old, df_new, spendvar, ...)
 Check whether reallocated spending retains the correct sum
 }
 \examples{
-# see ?implan_prepare()
+# see ?input_prep()
 }
 \seealso{
 Other functions to get spending by implan sector: 

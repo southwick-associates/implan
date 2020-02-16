@@ -4,14 +4,15 @@
 \alias{xlsx_write_table}
 \title{Write a data frame to an Excel tab}
 \usage{
-xlsx_write_table(df, tabname, filename)
+xlsx_write_table(df, filename, sheet = NULL)
 }
 \arguments{
 \item{df}{data frame to write to the Excel worksheet}
 
-\item{tabname}{name to use for Excel worksheet}
-
 \item{filename}{path where the Excel workbook will be written}
+
+\item{sheet}{name to use for Excel worksheet. If NULL (default) the name of
+the df will be used.}
 }
 \description{
 Requires an existing Excel file, preferably created using
@@ -20,8 +21,8 @@ Requires an existing Excel file, preferably created using
 }
 \examples{
 xlsx_initialize_workbook("tmp.xlsx")
-df <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
-xlsx_write_table(df, "moria", "tmp.xlsx")
+moria <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
+xlsx_write_table(moria, "tmp.xlsx")
 }
 \seealso{
 Other functions to transfer to/from implan: 

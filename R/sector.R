@@ -60,7 +60,7 @@ check_share_sums <- function(df, sharevar, ...) {
 #' @family functions to get spending by implan sector
 #' @export
 #' @examples
-#' # see ?implan_prepare()
+#' # see ?input_prep()
 check_spend_sums <- function(df_old, df_new, spendvar, ...) {
     spendvar <- enquo(spendvar)
     dims <- enquos(...)

@@ -124,6 +124,9 @@ xlsx_initialize_workbook <- function(filename) {
     openxlsx::saveWorkbook(wb, filename)
 }
 
+# TODO: in xlsx_write_table:
+# - probably use sheet = NULL to default to name of data frame
+
 #' Write a data frame to an Excel tab
 #'
 #' Requires an existing Excel file, preferably created using
@@ -131,21 +134,25 @@ xlsx_initialize_workbook <- function(filename) {
 #' (if it already exists) and a new tab will be written.
 #'
 #' @param df data frame to write to the Excel worksheet
-#' @param tabname name to use for Excel worksheet
+#' @param sheet name to use for Excel worksheet. If NULL (default) the name of
+#' the df will be used.
 #' @inheritParams xlsx_initialize_workbook
 #' @family functions to transfer to/from implan
 #' @export
 #' @examples
 #' xlsx_initialize_workbook("tmp.xlsx")
-#' df <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
-#' xlsx_write_table(df, "moria", "tmp.xlsx")
-xlsx_write_table <- function(df, tabname, filename) {
-    wb <- openxlsx::loadWorkbook(filename)
-    if (tabname %in% openxlsx::getSheetNames(filename)) {
-        openxlsx::removeWorksheet(wb, tabname)
+#' moria <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
+#' xlsx_write_table(moria, "tmp.xlsx")
+xlsx_write_table <- function(df, filename, sheet = NULL) {
+    if (is.null(sheet)) {
+        sheet <- deparse(substitute(df))
     }
-    openxlsx::addWorksheet(wb, tabname)
-    openxlsx::writeData(wb, sheet = tabname, df)
+    wb <- openxlsx::loadWorkbook(filename)
+    if (sheet %in% openxlsx::getSheetNames(filename)) {
+        openxlsx::removeWorksheet(wb, sheet)
+    }
+    openxlsx::addWorksheet(wb, sheet)
+    openxlsx::writeData(wb, sheet = sheet, df)
     openxlsx::saveWorkbook(wb, filename, overwrite = TRUE)
 }
 
@@ -158,15 +165,15 @@ xlsx_write_table <- function(df, tabname, filename) {
 #' @examples
 #' # see ?input_prep()
 xlsx_write_implan <- function(ls, xls_out) {
-    tabname <- ls$header$`Activity Name` # worksheet name will match activity name
+    sheet <- ls$header$`Activity Name` # worksheet name will match activity name
     xlsx_initialize_workbook(xls_out)
     wb <- openxlsx::loadWorkbook(xls_out)
-    if (tabname %in% openxlsx::getSheetNames(xls_out)) {
-        openxlsx::removeWorksheet(wb, tabname)
+    if (sheet %in% openxlsx::getSheetNames(xls_out)) {
+        openxlsx::removeWorksheet(wb, sheet)
     }
-    openxlsx::addWorksheet(wb, tabname)
-    openxlsx::writeData(wb, sheet = tabname, ls$header)
-    openxlsx::writeData(wb, sheet = tabname, ls$dat, startRow = 4)
+    openxlsx::addWorksheet(wb, sheet)
+    openxlsx::writeData(wb, sheet = sheet, ls$header)
+    openxlsx::writeData(wb, sheet = sheet, ls$dat, startRow = 4)
     openxlsx::saveWorkbook(wb, xls_out, overwrite = TRUE)
 }
 
