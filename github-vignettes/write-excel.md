@@ -21,7 +21,7 @@ library(implan)
 
 xlsx_initialize_workbook("tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
-#> [1] "README"
+#> [1] "README"   "huntComm" "huntInd"  "spending"
 ```
 
 ### Adding Results
@@ -39,9 +39,9 @@ head(spending, 2)
 #> 1 trip  food  14824024.
 #> 2 trip  lodge  3589912.
 
-xlsx_write_table(spending, "spending", "tmp.xlsx")
+xlsx_write_table(spending, "tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
-#> [1] "README"   "spending"
+#> [1] "README"   "huntComm" "huntInd"  "spending"
 ```
 
 ### Updating Results
@@ -52,10 +52,10 @@ you shouldn’t manually edit the Excel file (other than the README tab).
 
 ``` r
 # update "spending" to show by category
-data(categories) 
-left_join(spending, categories, by = c("type", "item")) %>%
+data("item_to_category") 
+left_join(spending, item_to_category, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
-    xlsx_write_table("spending", "tmp.xlsx")
+    xlsx_write_table("tmp.xlsx", "spending")
 
 openxlsx::readWorkbook("tmp.xlsx", "spending") %>% head(2)
 #>   type item   spend          category share

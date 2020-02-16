@@ -275,7 +275,7 @@ filepath <- system.file(
   "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xls") # copy to your working directory
-#> [1] FALSE
+#> [1] TRUE
 ```
 
 Step 3 can be accomplished by copy/pasting implan results into an Excel
@@ -286,5 +286,5 @@ filepath <- system.file(
   "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
 )
 file.copy(filepath, "tmp.xlsm") # copy to your working directory
-#> [1] FALSE
+#> [1] TRUE
 ```

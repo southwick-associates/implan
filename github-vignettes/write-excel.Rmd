@@ -47,8 +47,8 @@ Additional calls to `xlsx_write_table()` will simply overwrite tabs with the sam
 
 ```{r}
 # update "spending" to show by category
-data(categories) 
-left_join(spending, categories, by = c("type", "item")) %>%
+data("item_to_category") 
+left_join(spending, item_to_category, by = c("type", "item")) %>%
     mutate(spend = spend * share) %>%
     xlsx_write_table("tmp.xlsx", "spending")
 
