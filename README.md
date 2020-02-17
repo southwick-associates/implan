@@ -1,9 +1,11 @@
 
 # implan
 
-A Southwick-only R package that streamlines the process of working with Implan. It also provides some convenience functions for writing results to Excel worksheets.
+A Southwick-only R package to streamline Implan work, also providing functions for writing results to Excel worksheets.
 
 ## Installation
+
+From the R console:
 
 ```r
 install.packages("remotes")
