@@ -21,7 +21,7 @@ library(implan)
 
 xlsx_initialize_workbook("tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
-#> [1] "README"   "huntComm" "huntInd"  "spending"
+#> [1] "README"
 ```
 
 ### Adding Results
@@ -41,7 +41,7 @@ head(spending, 2)
 
 xlsx_write_table(spending, "tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
-#> [1] "README"   "huntComm" "huntInd"  "spending"
+#> [1] "README"   "spending"
 ```
 
 ### Updating Results
