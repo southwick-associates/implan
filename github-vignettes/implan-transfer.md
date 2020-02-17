@@ -12,44 +12,19 @@ The implan package streamlines several steps otherwise done in Excel:
 ### Elevator Pitch
 
 R code can be easily scaled up/down or ported to a new project without
-the manual restructuring needed in Excel. It’s also less error-prone and
-facilitates automated checks/summaries. You can see an example in the
-wild for B4W:
+the manual restructuring needed in Excel. It also facilitates automated
+checks/summaries. You can see an example in the wild for B4W:
 [implan-input](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/1-implan-input.R),
 [contributions](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/2-contributions.R)
 
-I’ve also included Excel files from the older approach in this package
-(details in [the last section](#excel-approach)).
+I’ve also included template files from the Excel approach in this
+package (details in [the last section](#excel-approach)).
 
 ## Implan Sector Allocation
 
-### TODO: Explain in a more informative way
-
-1.  Discuss sectoring schemes (category-to-sector) and how these:
-
-<!-- end list -->
-
-  - probably won’t vary by project (unless need categories need to be
-    added)
-  - the categories define the target for the item-to-category crosswalk
-  - include the check\_share\_sums (TRUE if sums to 100%)
-
-<!-- end list -->
-
-2.  Discuss item-category crosswalk:
-
-<!-- end list -->
-
-  - this may need to be constructed by hand, unless an item-breakout
-    from an existing projects (e.g., OIA) is used
-
-<!-- end list -->
-
-3.  Allocate (this is simple)
-
-Allocating spending to Implan sectors requires 1 or more crosswalk
-tables. The implan package includes example data to demonstrate the
-allocation process:
+Allocating spending to Implan sectors requires a spending table and 2
+crosswalk tables. The implan package includes example data to
+demonstrate the allocation process:
 
 ``` r
 library(dplyr)
@@ -75,9 +50,10 @@ spending
 
 ### Item to Category
 
-For the sample data, spending must first be reallocated from the “item”
-level to the “category” level. Spending is specified by 2 dimensions
-(`type`, `item`) for which `share` must sum to 100%:
+Spending must first be reallocated from the item level (e.g., from
+survey data) to the category level (e.g., “Food - Groceries”, etc.).
+Spending in the sample data is specified by 2 dimensions (`type`,
+`item`) for which `share` in the crosswalk table must sum to 100%:
 
 ``` r
 data(item_to_category)
@@ -116,8 +92,8 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, t
 
 ### Category to Sector
 
-In the same way, allocating to sectors uses a crosswalk (at the
-`category` dimension):
+In the same way, allocating to sectors uses a crosswalk at the
+`category` dimension (also referred to as implan sectoring schemes):
 
 ``` r
 data(category_to_sector546)
@@ -141,9 +117,9 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## Write to Excel
 
-We must first convert spending by sector to the necessary
-Industry/Commodity format. Each destination Excel tab requires 2 tables
-(header & data):
+To prepare for implan import, we first convert spending by sector to the
+necessary Industry/Commodity format. Each destination Excel tab requires
+2 tables (header & data):
 
 ``` r
 ind <- input_prep_ind(spend_sector, "huntInd")
@@ -213,7 +189,9 @@ list.files(hunt_dir)
 ### Get CSV Files
 
 The `output_read_csv()` function pulls all csv files for an activity
-into an R list:
+into an R list, with one data frame per input file. The names of the
+list correspond to a title row that Implan includes in the output csv
+files:
 
 ``` r
 dat <- output_read_csv(hunt_dir)
@@ -225,7 +203,7 @@ names(dat)
 #> [5] "impact summary"
 ```
 
-You can then combine these results into a single table with
+You can then combine these results into a single summary table with
 `output_combine()`:
 
 ``` r
@@ -243,8 +221,7 @@ It’s easy to scale-up this operation using a for loop (or `sapply`):
 
 ``` r
 impacts <- list()
-acts <- list.files(output_dir)
-for (i in acts) {
+for (i in c("bike", "hunt")) {
   impacts[[i]] <- output_read_csv(file.path(output_dir, i)) %>% 
     output_combine() %>% 
     mutate(activity = i)
@@ -266,9 +243,8 @@ bind_rows(impacts)
 
 ## Excel Approach
 
-The older approach combines steps 1 & 2 into an Excel workbook. I
-included a basic example in this package (these become much more complex
-when scaling up):
+The Excel approach combines steps 1 & 2 into an Excel workbook. I
+included a basic example (for wildlife watching) in this package:
 
 ``` r
 filepath <- system.file(
