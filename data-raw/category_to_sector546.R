@@ -10,5 +10,6 @@ load("data/sectors546.rda")
 category_to_sector546 <- category_to_sector536 %>%
     sector_update(sector536_to_sector546, sectors546) %>%
     select(group, category, sector, share, retail, description)
+implan::check_share_sums(category_to_sector546, share, category)
 
 usethis::use_data(category_to_sector546, overwrite = TRUE)

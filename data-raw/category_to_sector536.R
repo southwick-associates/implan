@@ -26,5 +26,6 @@ category_to_sector536 <- category_to_sector536 %>%
 load("data/sectors536.rda")
 category_to_sector536 <- category_to_sector536 %>%
     left_join(sectors536, by = c("group", "sector"))
+implan::check_share_sums(category_to_sector536, share, category)
 
 usethis::use_data(category_to_sector536, overwrite = TRUE)

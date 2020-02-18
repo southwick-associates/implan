@@ -34,7 +34,7 @@ Allocating spending to Implan sectors requires a spending table and 2 crosswalk 
 library(dplyr)
 library(implan)
 
-data(spending) # total hunting spending by item
+data(spending) # spending by activity_group-type-item
 spending
 ```
 
@@ -47,21 +47,22 @@ data(item_to_category)
 head(item_to_category, 2)
 
 # check the share variable - should print "TRUE"
-check_share_sums(df = item_to_category, sharevar = share, type, item)
+check_share_sums(df = item_to_category, sharevar = share, activity_group, type, item)
 ```
 
 Allocating is a simple matter of joining with the crosswalk table and multiplying:
 
 ```{r}
 spend_category <- spending %>%
-    left_join(item_to_category, by = c("type", "item")) %>%
+    left_join(item_to_category, by = c("activity_group", "type", "item")) %>%
     mutate(spend = spend * share) %>%
     select(-share) # no longer needed
 
 head(spend_category, 2)
 
 # check the spending allocation - should print "TRUE"
-check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, type, item)
+check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, 
+                 activity_group, type, item)
 ```
 
 ### Category to Sector
