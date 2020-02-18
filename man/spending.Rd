@@ -4,8 +4,10 @@
 \name{spending}
 \alias{spending}
 \title{Implan total hunting spending}
-\format{A data frame with 46 rows and 3 columns"
+\format{A data frame with 212 rows and 5 columns"
 \describe{
+  \item{activity_group}{"oia", "hunt", "fish", "wildlife"}
+  \item{act}{"bike", "trail", etc.}
   \item{type}{"trip" or "equip"}
   \item{item}{food, lodge, etc.}
   \item{spend}{total spending}

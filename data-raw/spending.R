@@ -3,7 +3,6 @@
 library(dplyr)
 
 spending <- readRDS("inst/extdata/spend2019.rds") %>%
-    filter(activity_group == "hunt") %>%
-    select(-activity_group, -act)
+    select(activity_group, act:spend)
 
 usethis::use_data(spending, overwrite = TRUE)

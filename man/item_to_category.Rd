@@ -4,8 +4,9 @@
 \name{item_to_category}
 \alias{item_to_category}
 \title{Implan hunting item to category crosswalk}
-\format{A data frame with 46 rows and 4 columns"
+\format{A data frame with 150 rows and 5 columns"
 \describe{
+  \item{activity_group}{"oia", "hunt", "fish", "wildlife"}
   \item{type}{"trip" or "equip"}
   \item{item}{food, lodge, etc.}
   \item{category}{implan spending category}

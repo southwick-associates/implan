@@ -3,8 +3,8 @@
 \docType{data}
 \name{category_to_sector546}
 \alias{category_to_sector546}
-\title{Implan sectoring scheme (546) for hunting}
-\format{A data frame with 152 rows (uniquely identified with category-sector) and 6 columns:
+\title{Implan sectoring scheme (546)}
+\format{A data frame with 266 rows (uniquely identified with category-sector) and 6 columns:
 \describe{
   \item{group}{"Ind" or "Comm"}
   \item{category}{spending category (e.g., "Food - Groceries", etc.)}
