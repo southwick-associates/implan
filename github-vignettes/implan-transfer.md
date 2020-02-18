@@ -30,42 +30,43 @@ demonstrate the allocation process:
 library(dplyr)
 library(implan)
 
-data(spending) # total hunting spending by item
+data(spending) # spending by activity-type-item
 spending
-#> # A tibble: 44 x 3
-#>    type  item          spend
-#>    <chr> <chr>         <dbl>
-#>  1 trip  food      14824024.
-#>  2 trip  lodge      3589912.
-#>  3 trip  plane       703034.
-#>  4 trip  pubtrans    438757.
-#>  5 trip  privtrans 17689308.
-#>  6 trip  guide      3893594.
-#>  7 trip  publand     109853.
-#>  8 trip  privland  10726392.
-#>  9 trip  heat        610683.
-#> 10 trip  rent       1209743.
-#> # ... with 34 more rows
+#> # A tibble: 212 x 5
+#>    activity_group act    type  item           spend
+#>    <chr>          <chr>  <chr> <chr>          <dbl>
+#>  1 oia            picnic trip  food      297224986.
+#>  2 oia            picnic trip  recreate  128068014.
+#>  3 oia            picnic trip  souvenir   39766814.
+#>  4 oia            picnic trip  transport 263321001.
+#>  5 oia            bike   trip  entrance    8468958.
+#>  6 oia            bike   trip  food      129033948.
+#>  7 oia            bike   trip  lodge      37740741.
+#>  8 oia            bike   trip  recreate   43518822.
+#>  9 oia            bike   trip  souvenir   27497377.
+#> 10 oia            bike   trip  transport  87046163.
+#> # ... with 202 more rows
 ```
 
 ### Item to Category
 
 Spending must first be reallocated from the item level (e.g., from
-survey data) to the category level (e.g., “Food - Groceries”, etc.).
-Spending in the sample data is specified by 2 dimensions (`type`,
-`item`) for which `share` in the crosswalk table must sum to 100%:
+survey data) to the category level (e.g., “Food - Groceries”, etc.). The
+spending crosswalk is specified by 3 dimensions (`activity_group`,
+`type`, `item`) for which `share` in the crosswalk table must sum to
+100%:
 
 ``` r
 data(item_to_category)
 head(item_to_category, 2)
-#> # A tibble: 2 x 4
-#>   type  item  category          share
-#>   <chr> <chr> <chr>             <dbl>
-#> 1 trip  food  Food - Restaurant   0.5
-#> 2 trip  food  Food - Groceries    0.5
+#> # A tibble: 2 x 5
+#>   activity_group type  item  category          share
+#>   <chr>          <chr> <chr> <chr>             <dbl>
+#> 1 oia            trip  food  Food - Restaurant 0.570
+#> 2 oia            trip  food  Food - Groceries  0.43
 
 # check the share variable - should print "TRUE"
-check_share_sums(df = item_to_category, sharevar = share, type, item)
+check_share_sums(df = item_to_category, sharevar = share, activity_group, type, item)
 #> [1] TRUE
 ```
 
@@ -74,19 +75,20 @@ multiplying:
 
 ``` r
 spend_category <- spending %>%
-    left_join(item_to_category, by = c("type", "item")) %>%
+    left_join(item_to_category, by = c("activity_group", "type", "item")) %>%
     mutate(spend = spend * share) %>%
     select(-share) # no longer needed
 
 head(spend_category, 2)
-#> # A tibble: 2 x 4
-#>   type  item     spend category         
-#>   <chr> <chr>    <dbl> <chr>            
-#> 1 trip  food  7412012. Food - Restaurant
-#> 2 trip  food  7412012. Food - Groceries
+#> # A tibble: 2 x 6
+#>   activity_group act    type  item       spend category         
+#>   <chr>          <chr>  <chr> <chr>      <dbl> <chr>            
+#> 1 oia            picnic trip  food  169418242. Food - Restaurant
+#> 2 oia            picnic trip  food  127806744. Food - Groceries
 
 # check the spending allocation - should print "TRUE"
-check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, type, item)
+check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, 
+                 activity_group, type, item)
 #> [1] TRUE
 ```
 
@@ -99,10 +101,10 @@ In the same way, allocating to sectors uses a crosswalk at the
 data(category_to_sector546)
 head(category_to_sector546, 2)
 #> # A tibble: 2 x 6
-#>   group category sector description                       share retail
-#>   <chr> <chr>     <dbl> <chr>                             <dbl> <chr> 
-#> 1 Comm  Ammo       3255 Small arms ammunition             0.325 Yes   
-#> 2 Comm  Ammo       3256 Ammunition, except for small arms 0.675 Yes
+#>   group category       sector share retail description                         
+#>   <chr> <chr>           <dbl> <dbl> <chr>  <chr>                               
+#> 1 Comm  Boat fuel        3157 0.023 Yes    Petroleum lubricating oil and grease
+#> 2 Ind   Boat launching    502 0.690 No     Amusement parks and arcades
 
 check_share_sums(category_to_sector546, sharevar = share, category)
 #> [1] TRUE
@@ -122,21 +124,21 @@ necessary Industry/Commodity format. Each destination Excel tab requires
 2 tables (header & data):
 
 ``` r
-ind <- input_prep_ind(spend_sector, "huntInd")
-comm <- input_prep_comm(spend_sector, "huntComm")
+ind <- input_prep_ind(spend_sector, "Ind")
+comm <- input_prep_comm(spend_sector, "Comm")
 
 comm$header
 #> # A tibble: 1 x 4
 #>   `Activity Type`  `Activity Name` `Activity Level` `Activity Year`
 #>   <chr>            <chr>                      <dbl>           <dbl>
-#> 1 Commodity Change huntComm                       1            2019
+#> 1 Commodity Change Comm                           1            2019
 
 head(comm$dat, 2)
 #> # A tibble: 2 x 5
 #>   Sector `Event Value` EventYear Retail `Local Direct Purchase`
 #>    <dbl>         <dbl>     <dbl> <chr>                    <dbl>
-#> 1   3002        11214.      2019 Yes                          1
-#> 2   3003       136677.      2019 Yes                          1
+#> 1   3002      1794094.      2019 Yes                          1
+#> 2   3003     21865892.      2019 Yes                          1
 ```
 
 After prepartion, the data can be written to Excel with
@@ -148,20 +150,24 @@ xlsx_write_implan(comm, "tmp.xlsx")
 xlsx_write_implan(ind, "tmp.xlsx")
 
 openxlsx::getSheetNames("tmp.xlsx")
-#> [1] "README"   "huntComm" "huntInd"
+#> [1] "Comm" "Ind"
 ```
 
 It’s also easy to create tabs at whatever dimension is required for the
 project:
 
 ``` r
-for (i in c("trip", "equip")) {
+acts <- sort(unique(spend_sector$act))
+for (i in acts) {
     x <- filter(spend_sector, type == i)
     input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
     input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
 }
 openxlsx::getSheetNames("tmp2.xlsx")
-#> [1] "README"    "tripInd"   "tripComm"  "equipInd"  "equipComm"
+#>  [1] "bikeInd"      "bikeComm"     "campInd"      "campComm"     "fishInd"     
+#>  [6] "fishComm"     "huntInd"      "huntComm"     "picnicInd"    "picnicComm"  
+#> [11] "snowInd"      "snowComm"     "trailInd"     "trailComm"    "waterInd"    
+#> [16] "waterComm"    "wildlifeInd"  "wildlifeComm"
 ```
 
 ## Read from Implan

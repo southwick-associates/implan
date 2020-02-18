@@ -34,13 +34,13 @@ Allocating spending to Implan sectors requires a spending table and 2 crosswalk 
 library(dplyr)
 library(implan)
 
-data(spending) # spending by activity_group-type-item
+data(spending) # spending by activity-type-item
 spending
 ```
 
 ### Item to Category
 
-Spending must first be reallocated from the item level (e.g., from survey data) to the category level (e.g., "Food - Groceries", etc.). Spending in the sample data is specified by 2 dimensions (`type`, `item`) for which `share` in the crosswalk table must sum to 100%:
+Spending must first be reallocated from the item level (e.g., from survey data) to the category level (e.g., "Food - Groceries", etc.). The spending crosswalk is specified by 3 dimensions (`activity_group`, `type`, `item`) for which `share` in the crosswalk table must sum to 100%:
 
 ```{r}
 data(item_to_category)
@@ -87,8 +87,8 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format. Each destination Excel tab requires 2 tables (header & data):
 
 ```{r}
-ind <- input_prep_ind(spend_sector, "huntInd")
-comm <- input_prep_comm(spend_sector, "huntComm")
+ind <- input_prep_ind(spend_sector, "Ind")
+comm <- input_prep_comm(spend_sector, "Comm")
 
 comm$header
 
@@ -107,7 +107,8 @@ openxlsx::getSheetNames("tmp.xlsx")
 It's also easy to create tabs at whatever dimension is required for the project:
 
 ```{r}
-for (i in c("trip", "equip")) {
+acts <- sort(unique(spend_sector$act))
+for (i in acts) {
     x <- filter(spend_sector, type == i)
     input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
     input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
