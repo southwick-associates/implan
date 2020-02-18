@@ -3,7 +3,7 @@
 \docType{data}
 \name{category_to_sector546}
 \alias{category_to_sector546}
-\title{Implan sectoring scheme (546)}
+\title{Implan sectoring scheme (546) 2020-02-18}
 \format{A data frame with 266 rows (uniquely identified with category-sector) and 6 columns:
 \describe{
   \item{group}{"Ind" or "Comm"}
@@ -17,7 +17,8 @@
 category_to_sector546
 }
 \description{
-A dataset that defines how hunting expenditures will be allocated to implan
+Matches the correspondingly dated versions in the Implan O365 group.
+A dataset that defines how expenditures will be allocated to implan
 }
 \seealso{
 Other data: 

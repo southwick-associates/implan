@@ -46,10 +46,11 @@
 #' @family data
 "sector536_to_sector546"
 
-#' Implan sectoring scheme (536)
+#' Implan sectoring scheme (536) 2020-02-18
 #'
-#' A dataset that defines how hunting expenditures will be allocated to implan
-#' sectors, prepared from `system.file("extdata", "implan-sectors536.xlsx", package = "implan")`
+#' Matches the correspondingly dated versions in the Implan O365 group.
+#' A dataset that defines how expenditures will be allocated to implan
+#' sectors, prepared from `system.file("extdata", "master-implan-sectoring536.xlsx", package = "implan")`
 #'
 #' @format A data frame with 247 rows (uniquely identified with category-sector) and 6 columns:
 #' \describe{
@@ -63,9 +64,10 @@
 #' @family data
 "category_to_sector536"
 
-#' Implan sectoring scheme (546)
+#' Implan sectoring scheme (546) 2020-02-18
 #'
-#' A dataset that defines how hunting expenditures will be allocated to implan
+#' Matches the correspondingly dated versions in the Implan O365 group.
+#' A dataset that defines how expenditures will be allocated to implan
 #'
 #' @format A data frame with 266 rows (uniquely identified with category-sector) and 6 columns:
 #' \describe{
