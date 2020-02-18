@@ -1,7 +1,7 @@
 
 # implan
 
-A Southwick-only R package to streamline Implan work, also providing functions for writing results to Excel worksheets.
+A Southwick-only R package to streamline Implan work.
 
 ## Installation
 
@@ -17,7 +17,6 @@ remotes::install_github("southwick-associates/implan")
 See the vignettes:
 
 - [Implan preparation, import, and export](github-vignettes/implan-transfer.md)
-- [Writing multiple results to one Excel workbook](github-vignettes/write-excel.md)
 - [Updating to a new Implan sectoring scheme](github-vignettes/sector-update.md)
 
 ## Development
