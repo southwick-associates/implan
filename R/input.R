@@ -1,6 +1,4 @@
-# functions to transfer to/from implan
-
-# Prep Input -------------------------------------------------------------------
+# functions for implan input
 
 #' Get a header table for Implan import
 #'
@@ -8,7 +6,7 @@
 #'
 #' @inheritParams input_prep
 #' @param activity_type either "Industry Change" or "Commodity Change"
-#' @family functions to transfer to/from implan
+#' @family functions for implan input
 #' @export
 #' @examples
 #' # see ?input_prep
@@ -32,7 +30,7 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' @param event_year Activity Year for Implan
 #' @param group Either "Ind" or "Comm"
 #' @export
-#' @family functions to transfer to/from implan
+#' @family functions for implan input
 #' @examples
 #' # get necessary sectoring
 #' data(category_to_sector536, sector536_to_sector546, sectors546)
@@ -103,161 +101,26 @@ input_prep_comm <- function(dat, activity_name, event_year = 2019) {
     input_prep(dat, activity_name, event_year, "Comm")
 }
 
-# Write Input -------------------------------------------------------------
-
-#' Initialize an Excel Workbook with a README tab
-#'
-#' The README sheet is intended to serve as documentation for the results
-#' stored in the Excel file.
-#'
-#' @param filename path where the Excel workbook will be written
-#' @family functions to transfer to/from implan
-#' @export
-#' @examples
-#' xlsx_initialize_workbook("tmp.xlsx")
-xlsx_initialize_workbook <- function(filename) {
-    if (file.exists(filename)) {
-        return(invisible()) # an existing file won't be overwritten
-    }
-    wb <- openxlsx::createWorkbook()
-    openxlsx::addWorksheet(wb, "README")
-    openxlsx::saveWorkbook(wb, filename)
-}
-
-# TODO: in xlsx_write_table:
-# - probably use sheet = NULL to default to name of data frame
-
-#' Write a data frame to an Excel tab
-#'
-#' Requires an existing Excel file, preferably created using
-#' \code{\link{xlsx_initialize_workbook}}. The selected tab will be removed
-#' (if it already exists) and a new tab will be written.
-#'
-#' @param df data frame to write to the Excel worksheet
-#' @param sheet name to use for Excel worksheet. If NULL (default) the name of
-#' the df will be used.
-#' @inheritParams xlsx_initialize_workbook
-#' @family functions to transfer to/from implan
-#' @export
-#' @examples
-#' xlsx_initialize_workbook("tmp.xlsx")
-#' moria <- data.frame(a = 1:4, b = c("speak", "friend", "and", "enter"))
-#' xlsx_write_table(moria, "tmp.xlsx")
-xlsx_write_table <- function(df, filename, sheet = NULL) {
-    if (is.null(sheet)) {
-        sheet <- deparse(substitute(df))
-    }
-    wb <- openxlsx::loadWorkbook(filename)
-    if (sheet %in% openxlsx::getSheetNames(filename)) {
-        openxlsx::removeWorksheet(wb, sheet)
-    }
-    openxlsx::addWorksheet(wb, sheet)
-    openxlsx::writeData(wb, sheet = sheet, df)
-    openxlsx::saveWorkbook(wb, filename, overwrite = TRUE)
-}
-
 #' Write data to a sheet for Excel Implan import
 #'
 #' @param ls list returned from implan_prepare_ind() or implan_prepare_comm()
-#' @param xls_out file path for output excel file
-#' @family functions to transfer to/from implan
+#' @param filename file path for output excel file
+#' @family functions for implan input
 #' @export
 #' @examples
 #' # see ?input_prep()
-xlsx_write_implan <- function(ls, xls_out) {
+xlsx_write_implan <- function(ls, filename) {
+    if (!file.exists(filename)) {
+        wb <- openxlsx::createWorkbook()
+    } else {
+        wb <- openxlsx::loadWorkbook(filename)
+    }
     sheet <- ls$header$`Activity Name` # worksheet name will match activity name
-    xlsx_initialize_workbook(xls_out)
-    wb <- openxlsx::loadWorkbook(xls_out)
-    if (sheet %in% openxlsx::getSheetNames(xls_out)) {
+    if (sheet %in% names(wb)) {
         openxlsx::removeWorksheet(wb, sheet)
     }
     openxlsx::addWorksheet(wb, sheet)
     openxlsx::writeData(wb, sheet = sheet, ls$header)
     openxlsx::writeData(wb, sheet = sheet, ls$dat, startRow = 4)
-    openxlsx::saveWorkbook(wb, xls_out, overwrite = TRUE)
-}
-
-# Load Output -------------------------------------------------------------
-
-#' Read Implan CSV output into R data frames for an implan activity
-#'
-#' @param dirname directory name that stores files for selected activity
-#' @family functions to transfer to/from implan
-#' @export
-#' @examples
-#' output_dir <- system.file("extdata", "output", package = "implan")
-#' hunt_dir <- file.path(output_dir, "hunt")
-#' dat <- output_read_csv(hunt_dir)
-#' output_combine(dat)
-output_read_csv <- function(dirname) {
-    # we only want csv files
-    files <- list.files(dirname, ".*\\.csv", full.names = TRUE)
-
-    # store tables in a list of data frames
-    # - define convenience function for reading csv files
-    read <- function(x, ...) suppressMessages(readr::read_csv(x, ...))
-
-    # - the header row (column names) is on row 2
-    dat <- files %>%
-        sapply(function(i) read(i, skip = 1), simplify = FALSE)
-
-    # - there is a title row that holds the table name
-    names(dat) <- files %>%
-        sapply(function(i) read(i, n_max = 1, col_names = FALSE)[1,1]) %>%
-        tolower()
-    dat
-}
-
-#' Combine csv output for an implan activity into one data frame
-#'
-#' Puts summary, tax fed, and tax local into a single table
-#'
-#' @param dat list produced by \code{\link{output_read_csv}}
-#' @family functions to transfer to/from implan
-#' @export
-#' @examples
-#' # see ?output_read_csv()
-output_combine <- function(dat) {
-    # define helper function for string matching
-    output_match <- function(string, match) {
-        is_match <- stringr::str_detect(string, match)
-        string[is_match]
-    }
-    # define function to run federal and state/local separately
-    get_tax <- function(match = "federal", tax_type = "FedTax") {
-        output_match(names(dat), match) %>% sapply(function(x) {
-            impact = ifelse(
-                stringr::str_detect(x, "direct"),
-                "Direct Effect", "Total Effect"
-            )
-            output_format_tax(dat[[x]], impact, tax_type)
-        }, simplify = FALSE) %>% bind_rows()
-    }
-    fed <- get_tax("federal", "FedTax")
-    local <- get_tax("local", "LocalTax")
-    dat[["impact summary"]] %>%
-        left_join(fed, by = "ImpactType") %>%
-        left_join(local, by = "ImpactType")
-}
-
-#' A helper function to format Tax Impact csv files
-#'
-#' This simplifies the tax results to just show sum of taxes by direct/total.
-#' Intended to be called from \code{\link{output_combine}}
-#'
-#' @param df data frame with tax results
-#' @param impact_type either "Direct Effect" or "Total Effect"
-#' @param tax_type either "FedTax" or "LocalTax"
-#' @family functions to transfer to/from implan
-#' @export
-output_format_tax <- function(df, impact_type, tax_type) {
-    strip_dollar <- function(x) {
-        stringr::str_remove_all(x, "\\$") %>% stringr::str_remove_all(",")
-    }
-    total_tax <- tail(df, 1) %>%
-        select(.data$`Employee Compensation`:.data$Corporations) %>%
-        mutate_all(function(x) as.numeric(strip_dollar(x)))
-    out <- tibble(impact_type, sum(total_tax))
-    names(out) <- c("ImpactType", tax_type)
-    out
+    openxlsx::saveWorkbook(wb, filename, overwrite = TRUE)
 }

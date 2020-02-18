@@ -4,12 +4,12 @@
 \alias{xlsx_write_implan}
 \title{Write data to a sheet for Excel Implan import}
 \usage{
-xlsx_write_implan(ls, xls_out)
+xlsx_write_implan(ls, filename)
 }
 \arguments{
 \item{ls}{list returned from implan_prepare_ind() or implan_prepare_comm()}
 
-\item{xls_out}{file path for output excel file}
+\item{filename}{file path for output excel file}
 }
 \description{
 Write data to a sheet for Excel Implan import
@@ -18,13 +18,8 @@ Write data to a sheet for Excel Implan import
 # see ?input_prep()
 }
 \seealso{
-Other functions to transfer to/from implan: 
+Other functions for implan input: 
 \code{\link{input_header}()},
-\code{\link{input_prep}()},
-\code{\link{output_combine}()},
-\code{\link{output_format_tax}()},
-\code{\link{output_read_csv}()},
-\code{\link{xlsx_initialize_workbook}()},
-\code{\link{xlsx_write_table}()}
+\code{\link{input_prep}()}
 }
-\concept{functions to transfer to/from implan}
+\concept{functions for implan input}

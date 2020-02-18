@@ -65,13 +65,8 @@ xlsx_write_implan(ind, "tmp.xlsx")
 # you'll need to manually save as ".xls" (in Excel) from Implan import
 }
 \seealso{
-Other functions to transfer to/from implan: 
+Other functions for implan input: 
 \code{\link{input_header}()},
-\code{\link{output_combine}()},
-\code{\link{output_format_tax}()},
-\code{\link{output_read_csv}()},
-\code{\link{xlsx_initialize_workbook}()},
-\code{\link{xlsx_write_implan}()},
-\code{\link{xlsx_write_table}()}
+\code{\link{xlsx_write_implan}()}
 }
-\concept{functions to transfer to/from implan}
+\concept{functions for implan input}
