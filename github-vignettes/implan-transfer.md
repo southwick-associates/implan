@@ -95,7 +95,9 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend,
 ### Category to Sector
 
 In the same way, allocating to sectors uses a crosswalk at the
-`category` dimension (also referred to as implan sectoring schemes):
+`category` dimension (also referred to as implan sectoring schemes, with
+up-to-date versions stored in [O365 \> Implan \> Sectoring
+Schemes](https://southwickassociatesinc.sharepoint.com/:f:/s/Implan/EnL9nwfijuROuo34BCV47fkB9yuOh8l0lDdaEtmEfL9TNA?e=R2dby9)):
 
 ``` r
 data(category_to_sector546)
