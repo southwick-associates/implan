@@ -1,7 +1,7 @@
 
 <!-- implan-transfer.md is generated from implan-transfer.Rmd. Please edit that file -->
 
-## Overview
+# Overview
 
 The implan package streamlines several steps otherwise done in Excel:
 
@@ -9,13 +9,20 @@ The implan package streamlines several steps otherwise done in Excel:
 2.  [Write Excel tabs for Implan import](#write-to-excel)
 3.  [Pull all Implan output (csv) into one table](#read-from-implan)
 
-### Elevator Pitch
+#### Elevator Pitch
 
 R code can be easily scaled up/down or ported to a new project without
 the manual restructuring needed in Excel. It also facilitates automated
-checks/summaries. You can see an example in the wild for B4W:
+checks/summaries. You can see a production example for B4W-19-01:
 [implan-input](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/1-implan-input.R),
 [contributions](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/2-contributions.R)
+
+#### Resources
+
+There is an Office 365 group with useful files ([O365 \>
+Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan))
+including master sectoring schemes (i.e., category to sector
+crosswalks).
 
 I’ve also included template files from the Excel approach in this
 package (details in [the last section](#excel-approach)).
