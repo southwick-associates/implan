@@ -11,9 +11,15 @@ Note that the included function provides a direct crosswalk update and
 doesn’t do any respecification (for example if the market basket of
 goods changes).
 
+#### Master Sector Schemes
+
+The master sectoring schemes (category to sector) are stored on Office
+365: [Implan \> Sectoring
+Schemes](https://southwickassociatesinc.sharepoint.com/:f:/s/Implan/EnL9nwfijuROuo34BCV47fkB9yuOh8l0lDdaEtmEfL9TNA?e=Pkiaai).
+
 ## Pull Data
 
-The necessary crosswalk file has been included in this package. I did
+The 536to546 crosswalk file has been included in this package. I did
 some pre-processing to get the crosswalk data into a more useful format
 ([code
 here](https://github.com/southwick-associates/implan/blob/master/data-raw/sector536_to_sector546.R)).
@@ -41,7 +47,8 @@ check_share_sums(sector536_to_sector546, crosswalk_ratio, group, sector536)
 #> [1] TRUE
 ```
 
-We need the 536 sectoring scheme for the update:
+We need the 536 sectoring scheme for the update, an example of which has
+been included in this package:
 
 ``` r
 data("category_to_sector536")

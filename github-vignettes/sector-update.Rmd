@@ -16,9 +16,13 @@ library(implan)
 
 The implan package includes some data and functions to help update category-sector crosswalks between implan sectoring schemes (e.g., [version 536 to 546](https://implanhelp.zendesk.com/hc/en-us/articles/360034896614-546-Industries-Conversions-Bridges-Construction-2018-Data)). Note that the included function provides a direct crosswalk update and doesn't do any respecification (for example if the market basket of goods changes).
 
+#### Master Sector Schemes
+
+The master sectoring schemes (category to sector) are stored on Office 365: [Implan > Sectoring Schemes](https://southwickassociatesinc.sharepoint.com/:f:/s/Implan/EnL9nwfijuROuo34BCV47fkB9yuOh8l0lDdaEtmEfL9TNA?e=Pkiaai).
+
 ## Pull Data
 
-The necessary crosswalk file has been included in this package. I did some pre-processing to get the crosswalk data into a more useful format ([code here](https://github.com/southwick-associates/implan/blob/master/data-raw/sector536_to_sector546.R)).
+The 536to546 crosswalk file has been included in this package. I did some pre-processing to get the crosswalk data into a more useful format ([code here](https://github.com/southwick-associates/implan/blob/master/data-raw/sector536_to_sector546.R)).
 
 ```{r}
 library(dplyr)
@@ -34,7 +38,7 @@ Note that the `CewAvgRatio` variable from the raw data was renamed to `crosswalk
 check_share_sums(sector536_to_sector546, crosswalk_ratio, group, sector536)
 ```
 
-We need the 536 sectoring scheme for the update:
+We need the 536 sectoring scheme for the update, an example of which has been included in this package:
 
 ```{r}
 data("category_to_sector536")
