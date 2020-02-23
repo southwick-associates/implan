@@ -168,7 +168,7 @@ project:
 ``` r
 acts <- sort(unique(spend_sector$act))
 for (i in acts) {
-    x <- filter(spend_sector, type == i)
+    x <- filter(spend_sector, act == i)
     input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
     input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
 }
@@ -178,6 +178,32 @@ openxlsx::getSheetNames("tmp2.xlsx")
 #> [11] "snowInd"      "snowComm"     "trailInd"     "trailComm"    "waterInd"    
 #> [16] "waterComm"    "wildlifeInd"  "wildlifeComm"
 ```
+
+And, of course, we can further scale-up the dimensions. For example, if
+we need to save multiple excel files (e.g., trip vs equip):
+
+``` r
+# function: write excel tabs for a file, one per activity for each of Ind/Comm
+write_acts <- function(spend_sector, outfile) {
+    for (i in acts) {
+        x <- filter(spend_sector, act == i)
+        input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan(outfile)
+        input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan(outfile)
+    }
+}
+for (i in c("trip", "equip")) {
+    x <- filter(spend_sector, type == i)
+    outfile <- paste0("tmp-", i, ".xlsx")
+    write_acts(x, outfile)
+}
+list.files(pattern = "\\.xlsx")
+#> [1] "tmp-equip.xlsx" "tmp-trip.xlsx"  "tmp.xlsx"       "tmp2.xlsx"
+```
+
+Note that for the above code, we could have used a nested loop with 2
+iterators (e.g., i,j). I tend to avoid such nesting because things can
+get confusing quickly. Making code more modular (by using functions)
+tends to make it more intelligible.
 
 ## Read from Implan
 
