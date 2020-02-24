@@ -14,13 +14,14 @@ Read Implan CSV output into R data frames for an implan activity
 }
 \examples{
 output_dir <- system.file("extdata", "output", package = "implan")
-hunt_dir <- file.path(output_dir, "hunt")
-dat <- output_read_csv(hunt_dir)
+dirname <- file.path(output_dir, "region1", "hunt")
+dat <- output_read_csv(dirname)
 output_combine(dat)
 }
 \seealso{
 Other functions for implan output loading: 
 \code{\link{output_combine}()},
-\code{\link{output_format_tax}()}
+\code{\link{output_format_tax}()},
+\code{\link{output}()}
 }
 \concept{functions for implan output loading}

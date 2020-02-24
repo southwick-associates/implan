@@ -13,7 +13,8 @@ Imports:
     dplyr,
     openxlsx,
     readr,
-    stringr
+    stringr,
+    tidyr
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.0.2

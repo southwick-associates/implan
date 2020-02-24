@@ -7,8 +7,8 @@
 #' @export
 #' @examples
 #' output_dir <- system.file("extdata", "output", package = "implan")
-#' hunt_dir <- file.path(output_dir, "hunt")
-#' dat <- output_read_csv(hunt_dir)
+#' dirname <- file.path(output_dir, "region1", "hunt")
+#' dat <- output_read_csv(dirname)
 #' output_combine(dat)
 output_read_csv <- function(dirname) {
     # we only want csv files
@@ -81,4 +81,52 @@ output_format_tax <- function(df, impact_type, tax_type) {
     out <- tibble(impact_type, sum(total_tax))
     names(out) <- c("ImpactType", tax_type)
     out
+}
+
+#' Read and Summarize Implan output
+#'
+#' This wraps \code{\link{output_read_csv}} and \code{\link{output_combine}}. It
+#' also will assume nested directories represent dimensions of interest. For
+#' example, if the top-level directory contains no csv files, it will inspect
+#' sub-directories and append the subdirectory names to a "dimension" variable.
+#'
+#' @inheritParams output_read_csv
+#' @family functions for implan output loading
+#' @export
+#' @examples
+#' output_dir <- system.file("extdata", "output", package = "implan")
+#'
+#' # we can see the nested struture of these files (i.e., multiple dimensions)
+#' list.files(output_dir, recursive = TRUE)
+#'
+#' # pull one dimension of results
+#' dirname <- file.path(output_dir, "region1", "bike")
+#' output(dirname)
+#'
+#' # pull all results
+#' df <- output(output_dir)
+#'
+#' # parse dimensions
+#' tidyr::separate(df, dimension, c("region", "act"), "/")
+output <- function(dirname) {
+    f <- list.files(dirname, recursive = TRUE)
+
+    # where there are no nested directories
+    if (identical(f, basename(f))) {
+        df <- output_read_csv(dirname) %>% output_combine()
+        return(df)
+    }
+
+    # otherwise, first get a vector showing the directory tree
+    dirs <- stringr::str_remove(f, basename(f)) %>%
+        unique() %>%
+        stringr::str_sub(1, -2) # drop the trailing "/"
+
+    # then pull files from each directory
+    sapply(dirs, function(x) {
+        output_read_csv(file.path(dirname, x)) %>%
+            output_combine() %>%
+            mutate(dimension = x)
+    }, simplify = FALSE) %>%
+        bind_rows()
 }

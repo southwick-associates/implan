@@ -18,6 +18,7 @@ Puts summary, tax fed, and tax local into a single table
 \seealso{
 Other functions for implan output loading: 
 \code{\link{output_format_tax}()},
-\code{\link{output_read_csv}()}
+\code{\link{output_read_csv}()},
+\code{\link{output}()}
 }
 \concept{functions for implan output loading}

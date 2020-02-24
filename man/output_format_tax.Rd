@@ -20,6 +20,7 @@ Intended to be called from \code{\link{output_combine}}
 \seealso{
 Other functions for implan output loading: 
 \code{\link{output_combine}()},
-\code{\link{output_read_csv}()}
+\code{\link{output_read_csv}()},
+\code{\link{output}()}
 }
 \concept{functions for implan output loading}
