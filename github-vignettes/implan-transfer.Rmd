@@ -30,7 +30,7 @@ There is an Office 365 group with useful files ([O365 > Implan](https://southwic
 
 ### Example Data
 
-The implan package includes example data for demonstration. The starting point is a table of total spending estimates by activity-type-item. The `activity_group` variable is included for joining with the item_to_category crosswalk table described below.
+The implan package includes example data for demonstration. The starting point is a table of total spending estimates by activity-type-item. The `activity_group` variable is included for joining with the item-to-category crosswalk table described below.
 
 ```{r}
 library(dplyr)
