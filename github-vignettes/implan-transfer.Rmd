@@ -123,7 +123,14 @@ openxlsx::getSheetNames("tmp.xlsx")
 In practice it's useful to wrap the prep/write steps into a single function:
 
 ```{r}
-input(spend_sector, 2019)
+input(spend_sector, "tmp2.xlsx", 2019)
+openxlsx::getSheetNames("tmp2.xlsx")
+```
+
+The `input()` function also allows grouping at an arbitrary number of dimensions, which are written to separate Excel sheets. For example, we could slice the results by activity and type (equip vs trip):
+
+```{r}
+input(spend_sector, "tmp3.xlsx", 2019, act, type)
 ```
 
 
