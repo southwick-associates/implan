@@ -149,21 +149,21 @@ xlsx_write_implan <- function(ls, filename) {
 #' # see ?input_prep()
 input <- function(dat, filename, event_year, ...) {
     # wrapping prep & write steps into one function
-    prep_write <- function(dat, filename, dim_name = "") {
-        input_prep_ind(dat, paste0(dim_name, "Ind"), event_year) %>%
+    prep_write <- function(df, dim_name = "") {
+        input_prep_ind(df, paste0(dim_name, "Ind"), event_year) %>%
             xlsx_write_implan(filename)
-        input_prep_comm(dat, paste0(dim_name, "Comm"), event_year) %>%
+        input_prep_comm(df, paste0(dim_name, "Comm"), event_year) %>%
             xlsx_write_implan(filename)
     }
     dims <- enquos(...)
     if (length(dims) == 0) {
-        prep_write(dat, filename)
+        prep_write(dat)
         return(invisible())
     }
     out <- group_split(dat, !!! dims) %>%
-        lapply(function(x) {
-            dim_vals <- select(x, !!! dims) %>% head(1)
+        lapply(function(df) {
+            dim_vals <- select(df, !!! dims) %>% head(1)
             dim_name <- unlist(dim_vals) %>% paste(collapse = "")
-            prep_write(x, filename, dim_name)
+            prep_write(df, filename, dim_name)
         })
 }

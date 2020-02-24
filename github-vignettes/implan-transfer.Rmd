@@ -92,7 +92,11 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## 2. Input Write to Excel
 
-To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format using `input_prep_ind()`. Each destination Excel tab requires two tables (header & data), so `input_prep_ind()` returns a list of two data frames.:
+Writing to Excel (for Implan import) can do done with a `input()` function. This function wraps two steps that I think are worth distinguishing:
+
+### input_prep()
+
+To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format using `input_prep()` (which has separate versions for Industry and Commodity). Each destination Excel tab requires two tables (header & data), so `input_prep()` returns a list of two data frames.:
 
 ```{r}
 ind <- input_prep_ind(spend_sector, "Ind")
