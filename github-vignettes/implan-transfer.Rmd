@@ -92,29 +92,40 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## 2. Input Write to Excel
 
-Writing to Excel (for Implan import) can do done with a `input()` function. This function wraps two steps that I think are worth distinguishing:
+Writing to Excel (for Implan import) can do done with the `input()` function. This function wraps two steps that I think are worth distinguishing:
 
 ### input_prep()
 
-To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format using `input_prep()` (which has separate versions for Industry and Commodity). Each destination Excel tab requires two tables (header & data), so `input_prep()` returns a list of two data frames.:
+To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format using `input_prep()` (which has separate convenience functions for Industry and Commodity). Each destination Excel tab requires two tables (header & data), so `input_prep()` returns a list of two data frames.:
 
 ```{r}
-ind <- input_prep_ind(spend_sector, "Ind")
-comm <- input_prep_comm(spend_sector, "Comm")
+ind <- input_prep_ind(spend_sector, activity_name = "Ind", event_year = 2019)
+comm <- input_prep_comm(spend_sector, activity_name = "Comm", event_year = 2019)
 
 comm$header
 
 head(comm$dat, 2)
 ```
 
-After prepartion, the data can be written to Excel with `xlsx_write_implan()`. Note that when you are ready for Implan import, you'll first need to open the `.xlsx` file and save to the legacy `.xls` format which Implan requires.
+### input_write()
+
+After prepartion, the data can be written to Excel with `input_write()`. Note that when you are ready for Implan import, you'll first need to open the `.xlsx` file and save to the legacy `.xls` format which Implan requires.
 
 ```{r}
-xlsx_write_implan(comm, "tmp.xlsx")
-xlsx_write_implan(ind, "tmp.xlsx")
+input_write(comm, "tmp.xlsx")
+input_write(ind, "tmp.xlsx")
 
 openxlsx::getSheetNames("tmp.xlsx")
 ```
+
+### input()
+
+In practice it's useful to wrap the prep/write steps into a single function:
+
+```{r}
+input(spend_sector, 2019)
+```
+
 
 It's also easy to create multiple Excel sheets corresponding to whatever dimensions are required for the project. For example, by activity:
 
@@ -122,8 +133,8 @@ It's also easy to create multiple Excel sheets corresponding to whatever dimensi
 acts <- sort(unique(spend_sector$act))
 for (i in acts) {
     df <- filter(spend_sector, act == i)
-    input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
-    input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
+    input_prep_ind(df, paste0(i, "Ind")) %>% input_write("tmp2.xlsx")
+    input_prep_comm(df, paste0(i, "Comm")) %>% input_write("tmp2.xlsx")
 }
 openxlsx::getSheetNames("tmp2.xlsx")
 ```
@@ -136,8 +147,8 @@ write_dims <- function(spend_sector, outfile, dimension = "act") {
     dims <- sort(unique(spend_sector[[dimension]]))
     for (i in dims) {
         df <- filter(spend_sector, .data[[dimension]] == i)
-        input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan(outfile)
-        input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan(outfile)
+        input_prep_ind(df, paste0(i, "Ind")) %>% input_write(outfile)
+        input_prep_comm(df, paste0(i, "Comm")) %>% input_write(outfile)
     }
 }
 for (i in c("trip", "equip")) {
