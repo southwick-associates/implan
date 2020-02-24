@@ -16,9 +16,9 @@ library(implan)
 
 The implan package streamlines several steps otherwise done in Excel:
 
-1. [Allocate spending by Implan sector](#implan-sector-allocation)
-2. [Write Excel tabs for Implan import](#write-to-excel)
-3. [Pull all Implan output (csv) into one table](#read-from-implan)
+1. [Prepare](#prepare-implan-sector-allocation): Allocate spending by Implan sector and validate using `implan::check` functions.
+2. [Input](#input-write-to-excel): Write Excel tabs for Implan import using `implan::input()`
+3. [Output](#output-read-from-implan): Pull all Implan output (csv) into a table using `implan::output_read_csv()`
 
 ### Elevator Pitch
 
@@ -30,7 +30,7 @@ There is an Office 365 group with useful files ([O365 > Implan](https://southwic
 
 I've also included template files from the Excel approach in this package (details in [the last section](#excel-approach)).
 
-## Implan Sector Allocation
+## 1. Prepare Implan Sector Allocation
 
 Allocating spending to Implan sectors requires a spending table and 2 crosswalk tables. The implan package includes example data to demonstrate the allocation process:
 
@@ -86,9 +86,9 @@ spend_sector <- spend_category %>%
 check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spend, category)
 ```
 
-## Write to Excel
+## 2. Input Write to Excel
 
-To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format. Each destination Excel tab requires 2 tables (header & data):
+To prepare for implan import, we first convert spending by sector to the necessary Industry/Commodity format using `input_prep_ind()`. Each destination Excel tab requires two tables (header & data), so `input_prep_ind()` returns a list of two data frames.:
 
 ```{r}
 ind <- input_prep_ind(spend_sector, "Ind")
@@ -99,7 +99,7 @@ comm$header
 head(comm$dat, 2)
 ```
 
-After prepartion, the data can be written to Excel with `xlsx_write_implan()`. Note that you'll need to open the `.xlsx` file and save as `.xls` prior to Implan import.
+After prepartion, the data can be written to Excel with `xlsx_write_implan()`. Note that when you are ready for Implan import, you'll first need to open the `.xlsx` file and save to the legacy `.xls` format which Implan requires.
 
 ```{r}
 xlsx_write_implan(comm, "tmp.xlsx")
@@ -108,40 +108,42 @@ xlsx_write_implan(ind, "tmp.xlsx")
 openxlsx::getSheetNames("tmp.xlsx")
 ```
 
-It's also easy to create tabs at whatever dimension is required for the project:
+It's also easy to create multiple Excel sheets corresponding to whatever dimensions are required for the project. For example, by activity:
 
 ```{r}
 acts <- sort(unique(spend_sector$act))
 for (i in acts) {
-    x <- filter(spend_sector, act == i)
-    input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
-    input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
+    df <- filter(spend_sector, act == i)
+    input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
+    input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
 }
 openxlsx::getSheetNames("tmp2.xlsx")
 ```
 
-And, of course, we can further scale-up the dimensions. For example, if we need to save multiple excel files (e.g., trip vs equip):
+And, of course, we can further scale-up the dimensions. For example, let's assume we also need to save multiple excel files, trip vs equip separately. Here I first make a function to wrap the by-activity loop above. I also generalized it to work at any dimension since I suspect it could be useful for multiple projects. The function can then be applied to produce multiple Excel files:
 
 ```{r}
-# function: write excel tabs for a file, one per activity for each of Ind/Comm
-write_acts <- function(spend_sector, outfile) {
-    for (i in acts) {
-        x <- filter(spend_sector, act == i)
-        input_prep_ind(x, paste0(i, "Ind")) %>% xlsx_write_implan(outfile)
-        input_prep_comm(x, paste0(i, "Comm")) %>% xlsx_write_implan(outfile)
+# write implan sheets an excel file, one sheet per dimension for each group (Ind vs Comm)
+write_dims <- function(spend_sector, outfile, dimension = "act") {
+    dims <- sort(unique(spend_sector[[dimension]]))
+    for (i in dims) {
+        df <- filter(spend_sector, .data[[dimension]] == i)
+        input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan(outfile)
+        input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan(outfile)
     }
 }
 for (i in c("trip", "equip")) {
-    x <- filter(spend_sector, type == i)
-    outfile <- paste0("tmp-", i, ".xlsx")
-    write_acts(x, outfile)
+    write_dims(
+        spend_sector = filter(spend_sector, type == i),
+        outfile = paste0("tmp-", i, ".xlsx")
+    )
 }
 list.files(pattern = "\\.xlsx")
 ```
 
-Note that for the above code, we could have used a nested loop with 2 iterators (e.g., i,j). I tend to avoid such nesting because things can get confusing quickly. Making code more modular (by using functions) tends to make it more intelligible.
+Note that for the above code, we could have used a nested loop with two iterators (e.g., i,j). I tend to avoid such nesting because things can get confusing quickly. Making code more modular (by using functions) tends to make it more intelligible and portable (e.g., to other projects).
 
-## Read from Implan
+## 3. Output Read from Implan
 
 From Implan, you'll need to save output results into csv files, where each Implan activity should have its own folder of results. Two example activities are included in this package:
 
