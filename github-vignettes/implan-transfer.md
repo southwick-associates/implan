@@ -6,11 +6,12 @@
 The implan package streamlines several steps otherwise done in Excel:
 
 1.  [Prepare](#1-prepare-implan-sector-allocation): Allocate spending by
-    Implan sector and validate using `implan::check` functions.
-2.  [Input](#2-input-write-to-excel): Write Excel tabs for Implan import
-    using `implan::input()`
-3.  [Output](#3-output-read-from-implan): Pull all Implan output (csv)
-    into a table using `implan::output()`
+    Implan sector using crosswalks and validate using `implan::check`
+    functions.
+2.  [Input](#2-input-write-to-excel): Write Excel sheets for Implan
+    import using `implan::input()`
+3.  [Output](#3-output-read-from-implan): Pull Implan output (csv) into
+    a table using `implan::output()`
 
 ### Elevator Pitch
 
@@ -60,8 +61,7 @@ spending
 ## 1\. Prepare Implan Sector Allocation
 
 Allocating spending to Implan sectors requires a spending table and 2
-crosswalk tables. The implan package includes crosswalk tables to
-demonstrate the allocation process.
+crosswalk tables: item-to-category, category-to-sector.
 
 ### Item to Category
 
@@ -73,8 +73,8 @@ Items in the example data mostly have a 1-to-1 correspondence with
 categories, but several need to be split into multiple categories (e.g.,
 food), so we need a `share` variable to specify the breakout
 percentages. The crosswalk is specified by 3 dimensions
-(`activity_group`, `type`, `item`) across which `share` must sum to
-100%. We can confirm this using `check_share_sums()`:
+(`activity_group`, `type`, `item`) across which share must sum to 100%.
+We can confirm this using `check_share_sums()`:
 
 ``` r
 data(item_to_category)
@@ -147,16 +147,15 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 ## 2\. Input Write to Excel
 
 Writing to Excel (for Implan import) can do done with the `input()`
-function. This function wraps two steps that I think are worth
+function. This function combines two steps that are worth
 distinguishing:
 
-### input\_prep()
+  - `input_prep()` converts spending by sector to the two tables
+    (header, data) needed in each Excel sheet
 
-To prepare for implan import, we first convert spending by sector to the
-necessary Industry/Commodity format using `input_prep()` (which has
-separate convenience functions for Industry and Commodity). Each
-destination Excel tab requires two tables (header & data), so
-`input_prep()` returns a list of two data frames.:
+  - `input_write()` adds the prepared data to an Excel file
+
+<!-- end list -->
 
 ``` r
 ind <- input_prep_ind(spend_sector, activity_name = "Ind", event_year = 2019)
@@ -174,16 +173,7 @@ head(comm$dat, 2)
 #>    <dbl>         <dbl>     <dbl> <chr>                    <dbl>
 #> 1   3002      1794094.      2019 Yes                          1
 #> 2   3003     21865892.      2019 Yes                          1
-```
 
-### input\_write()
-
-After prepartion, the data can be written to Excel with `input_write()`.
-Note that when you are ready for Implan import, you’ll first need to
-open the `.xlsx` file and save to the legacy `.xls` format which Implan
-requires.
-
-``` r
 input_write(comm, "tmp.xlsx")
 input_write(ind, "tmp.xlsx")
 
@@ -191,16 +181,18 @@ openxlsx::getSheetNames("tmp.xlsx")
 #> [1] "Comm" "Ind"
 ```
 
-### input()
-
-In practice it’s useful to wrap the prep/write steps into a single
-function:
+It’s convenient to wrap the prep/write steps into a single function for
+production.
 
 ``` r
 input(spend_sector, "tmp2.xlsx", 2019)
+
 openxlsx::getSheetNames("tmp2.xlsx")
-#> [1] "Ind"  "Comm"
+#> [1] "Comm" "Ind"
 ```
+
+Note that for Implan import, you’ll first need to open the `.xlsx` file
+and save to the legacy `.xls` format which Implan requires.
 
 The `input()` function also allows grouping at an arbitrary number of
 dimensions, which get written to separate Excel sheets. For example, we
@@ -208,19 +200,20 @@ could split the results by `act` and `type`:
 
 ``` r
 input(spend_sector, "tmp3.xlsx", 2019, act, type)
+
 openxlsx::getSheetNames("tmp3.xlsx")
-#>  [1] "bikeequipInd"      "bikeequipComm"     "biketripInd"      
-#>  [4] "biketripComm"      "campequipInd"      "campequipComm"    
-#>  [7] "camptripInd"       "camptripComm"      "fishequipInd"     
-#> [10] "fishequipComm"     "fishtripInd"       "fishtripComm"     
-#> [13] "huntequipInd"      "huntequipComm"     "hunttripInd"      
-#> [16] "hunttripComm"      "picnictripInd"     "picnictripComm"   
-#> [19] "snowequipInd"      "snowequipComm"     "snowtripInd"      
-#> [22] "snowtripComm"      "trailequipInd"     "trailequipComm"   
-#> [25] "trailtripInd"      "trailtripComm"     "waterequipInd"    
-#> [28] "waterequipComm"    "watertripInd"      "watertripComm"    
-#> [31] "wildlifeequipInd"  "wildlifeequipComm" "wildlifetripInd"  
-#> [34] "wildlifetripComm"
+#>  [1] "bikeequipComm"     "bikeequipInd"      "biketripComm"     
+#>  [4] "biketripInd"       "campequipComm"     "campequipInd"     
+#>  [7] "camptripComm"      "camptripInd"       "fishequipComm"    
+#> [10] "fishequipInd"      "fishtripComm"      "fishtripInd"      
+#> [13] "huntequipComm"     "huntequipInd"      "hunttripComm"     
+#> [16] "hunttripInd"       "picnictripComm"    "picnictripInd"    
+#> [19] "snowequipComm"     "snowequipInd"      "snowtripComm"     
+#> [22] "snowtripInd"       "trailequipComm"    "trailequipInd"    
+#> [25] "trailtripComm"     "trailtripInd"      "waterequipComm"   
+#> [28] "waterequipInd"     "watertripComm"     "watertripInd"     
+#> [31] "wildlifeequipComm" "wildlifeequipInd"  "wildlifetripComm" 
+#> [34] "wildlifetripInd"
 ```
 
 In practice we might want to delineate one of these dimensions with
@@ -232,30 +225,31 @@ for (i in c("equip", "trip")) {
     filename <- paste0("tmp-", i, ".xlsx")
     input(dat, filename, 2019, act)
 }
+
 list.files(pattern = "\\.xlsx")
 #> [1] "tmp-equip.xlsx" "tmp-trip.xlsx"  "tmp.xlsx"       "tmp2.xlsx"     
 #> [5] "tmp3.xlsx"
 
 openxlsx::getSheetNames("tmp-trip.xlsx")
-#>  [1] "bikeInd"      "bikeComm"     "campInd"      "campComm"     "fishInd"     
-#>  [6] "fishComm"     "huntInd"      "huntComm"     "picnicInd"    "picnicComm"  
-#> [11] "snowInd"      "snowComm"     "trailInd"     "trailComm"    "waterInd"    
-#> [16] "waterComm"    "wildlifeInd"  "wildlifeComm"
+#>  [1] "bikeComm"     "bikeInd"      "campComm"     "campInd"      "fishComm"    
+#>  [6] "fishInd"      "huntComm"     "huntInd"      "picnicComm"   "picnicInd"   
+#> [11] "snowComm"     "snowInd"      "trailComm"    "trailInd"     "waterComm"   
+#> [16] "waterInd"     "wildlifeComm" "wildlifeInd"
 ```
 
 ## 3\. Output Read from Implan
 
 From Implan, you’ll need to save output results into csv files, where
 each Implan activity should have its own folder of results. Two example
-activities are included in this package:
+activities are included in this package to demonstrate:
 
 ``` r
-output_dir <- system.file("extdata", "output", package = "implan", mustWork = TRUE)
+output_dir <- system.file("extdata", "output", "region1", package = "implan")
 list.files(output_dir)
 #> [1] "bike" "hunt"
 ```
 
-Typically, you’ll want 5 sets of results per activity:
+Typically, you’ll have five sets of results per activity:
 
 ``` r
 hunt_dir <- file.path(output_dir, "hunt")
@@ -265,12 +259,20 @@ list.files(hunt_dir)
 #> [5] "B4W_ColoradoModelSummary.csv"
 ```
 
-### Get CSV Files
+### output()
 
-The `output_read_csv()` function pulls all csv files for an activity
-into an R list, with one data frame per input file. The names of the
-list correspond to a title row that Implan includes in the output csv
-files:
+We can use the `output()` function to pull the data, but I’ll break out
+its two subprocesses for illustration:
+
+  - `output_read_csv()` pulls all csv files for an activity into an R
+    list, with one data frame per input file. The names of the list
+    correspond to a title row that Implan includes in the output csv
+    files
+
+  - `output_combine()` aggregates the tax results and appends to the
+    overall summary
+
+<!-- end list -->
 
 ``` r
 dat <- output_read_csv(hunt_dir)
@@ -280,12 +282,7 @@ names(dat)
 #> [3] "state and local tax impact by direct"
 #> [4] "state and local tax impact by total" 
 #> [5] "impact summary"
-```
 
-You can then combine these results into a single summary table with
-`output_combine()`:
-
-``` r
 output_combine(dat)
 #> # A tibble: 4 x 7
 #>   ImpactType    Employment LaborIncome TotalValueAdded   Output  FedTax LocalTax
@@ -296,28 +293,56 @@ output_combine(dat)
 #> 4 Total Effect       2469.   95544620.      150651032.   2.83e8  2.04e7 15554404
 ```
 
-It’s easy to scale-up this operation using a for loop (or `sapply`):
+In practice we’ll usually want to pull multiple activities. This is
+easily accomplished with `output()`:
 
 ``` r
-impacts <- list()
-for (i in c("bike", "hunt")) {
-  impacts[[i]] <- output_read_csv(file.path(output_dir, i)) %>% 
-    output_combine() %>% 
-    mutate(activity = i)
-}
-bind_rows(impacts)
-#> # A tibble: 8 x 8
-#>   ImpactType Employment LaborIncome TotalValueAdded Output  FedTax LocalTax
-#>   <chr>           <dbl>       <dbl>           <dbl>  <dbl>   <dbl>    <dbl>
-#> 1 Direct Ef~      2893.  113060079.      185259583. 3.41e8  2.61e7 31961988
-#> 2 Indirect ~       808.   54793181.       82309563. 1.60e8 NA            NA
-#> 3 Induced E~       962.   48677587.       88529239. 1.53e8 NA            NA
-#> 4 Total Eff~      4663.  216530848.      356098385. 6.54e8  4.81e7 46878467
-#> 5 Direct Ef~      1694.   51488607.       77127905. 1.48e8  1.10e7  9377690
-#> 6 Indirect ~       351.   22577739.       34465045. 6.75e7 NA            NA
-#> 7 Induced E~       425.   21478274.       39058082. 6.75e7 NA            NA
-#> 8 Total Eff~      2469.   95544620.      150651032. 2.83e8  2.04e7 15554404
-#> # ... with 1 more variable: activity <chr>
+list.files(output_dir)
+#> [1] "bike" "hunt"
+
+df <- output(output_dir)
+
+count(df, dimension)
+#> # A tibble: 2 x 2
+#>   dimension     n
+#>   <chr>     <int>
+#> 1 bike          4
+#> 2 hunt          4
+```
+
+The `output()` function also arbitrarily scales up to multiple
+dimensions. The example data actually includes two dimensions (region by
+activity) which we can use to demonstrate:
+
+``` r
+output_dir <- system.file("extdata", "output", package = "implan")
+df <- output(output_dir)
+
+count(df, dimension)
+#> # A tibble: 4 x 2
+#>   dimension        n
+#>   <chr>        <int>
+#> 1 region1/bike     4
+#> 2 region1/hunt     4
+#> 3 region2/bike     4
+#> 4 region2/hunt     4
+```
+
+It’s probably more useful to have the dimensions represented by distinct
+variables:
+
+``` r
+library(tidyr)
+df <- separate(df, dimension, c("region", "act"))
+
+count(df, region, act)
+#> # A tibble: 4 x 3
+#>   region  act       n
+#>   <chr>   <chr> <int>
+#> 1 region1 bike      4
+#> 2 region1 hunt      4
+#> 3 region2 bike      4
+#> 4 region2 hunt      4
 ```
 
 ## Excel Approach

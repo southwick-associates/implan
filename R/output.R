@@ -122,11 +122,11 @@ output <- function(dirname) {
         unique() %>%
         stringr::str_sub(1, -2) # drop the trailing "/"
 
-    # then pull files from each directory
+    # then pull files from each directory, label, and stack
     sapply(dirs, function(x) {
         output_read_csv(file.path(dirname, x)) %>%
             output_combine() %>%
-            mutate(dimension = x)
+            mutate(dimension = x) # label
     }, simplify = FALSE) %>%
         bind_rows()
 }
