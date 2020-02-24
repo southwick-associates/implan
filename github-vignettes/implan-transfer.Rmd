@@ -18,7 +18,7 @@ The implan package streamlines several steps otherwise done in Excel:
 
 1. [Prepare](#1-prepare-implan-sector-allocation): Allocate spending by Implan sector and validate using `implan::check` functions.
 2. [Input](#2-input-write-to-excel): Write Excel tabs for Implan import using `implan::input()`
-3. [Output](#3-output-read-from-implan): Pull all Implan output (csv) into a table using `implan::output_read_csv()`
+3. [Output](#3-output-read-from-implan): Pull all Implan output (csv) into a table using `implan::output()`
 
 ### Elevator Pitch
 
