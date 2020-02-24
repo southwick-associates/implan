@@ -59,7 +59,7 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' # write to an excel worksheet
 #' # you'll need to manually save as ".xls" (in Excel) from Implan import
 #' \dontrun{
-#' xlsx_write_implan(ind, "tmp.xlsx")
+#' input_write(ind, "tmp.xlsx")
 #' }
 #'
 #' # write sheets by activity-type
@@ -116,7 +116,7 @@ input_prep_comm <- function(dat, activity_name, event_year) {
 #' @export
 #' @examples
 #' # see ?input_prep()
-xlsx_write_implan <- function(ls, filename) {
+input_write <- function(ls, filename) {
     if (!file.exists(filename)) {
         wb <- openxlsx::createWorkbook()
     } else {
@@ -135,12 +135,12 @@ xlsx_write_implan <- function(ls, filename) {
 #' Write spending to Excel for Implan import
 #'
 #' This writes separate sheets for commodity and industry by wrapping
-#' \code{\link{input_prep}} and \code{\link{xlsx_write_implan}}. The dots
+#' \code{\link{input_prep}} and \code{\link{input_write}}. The dots
 #' argument allows for an arbitrary number of grouping dimensions (for separate
 #' sheets by dimensions).
 #'
 #' @inheritParams input_prep
-#' @inheritParams xlsx_write_implan
+#' @inheritParams input_write
 #' @param ... Optional grouping variables (unquoted) for separating sheets
 #' across one or more dimensions
 #' @family functions for implan input
@@ -151,9 +151,9 @@ input <- function(dat, filename, event_year, ...) {
     # wrapping prep & write steps into one function
     prep_write <- function(df, dim_name = "") {
         input_prep_ind(df, paste0(dim_name, "Ind"), event_year) %>%
-            xlsx_write_implan(filename)
+            input_write(filename)
         input_prep_comm(df, paste0(dim_name, "Comm"), event_year) %>%
-            xlsx_write_implan(filename)
+            input_write(filename)
     }
     dims <- enquos(...)
     if (length(dims) == 0) {

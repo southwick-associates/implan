@@ -63,7 +63,7 @@ ind
 # write to an excel worksheet
 # you'll need to manually save as ".xls" (in Excel) from Implan import
 \dontrun{
-xlsx_write_implan(ind, "tmp.xlsx")
+input_write(ind, "tmp.xlsx")
 }
 
 # write sheets by activity-type
@@ -74,7 +74,7 @@ input(spend_sector, "tmp2.xlsx", 2019, act, type)
 \seealso{
 Other functions for implan input: 
 \code{\link{input_header}()},
-\code{\link{input}()},
-\code{\link{xlsx_write_implan}()}
+\code{\link{input_write}()},
+\code{\link{input}()}
 }
 \concept{functions for implan input}

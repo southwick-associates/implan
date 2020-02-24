@@ -22,7 +22,7 @@ This is a convenience function called from \code{\link{input_prep}}
 \seealso{
 Other functions for implan input: 
 \code{\link{input_prep}()},
-\code{\link{input}()},
-\code{\link{xlsx_write_implan}()}
+\code{\link{input_write}()},
+\code{\link{input}()}
 }
 \concept{functions for implan input}

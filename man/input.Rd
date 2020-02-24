@@ -19,7 +19,7 @@ across one or more dimensions}
 }
 \description{
 This writes separate sheets for commodity and industry by wrapping
-\code{\link{input_prep}} and \code{\link{xlsx_write_implan}}. The dots
+\code{\link{input_prep}} and \code{\link{input_write}}. The dots
 argument allows for an arbitrary number of grouping dimensions (for separate
 sheets by dimensions).
 }
@@ -30,6 +30,6 @@ sheets by dimensions).
 Other functions for implan input: 
 \code{\link{input_header}()},
 \code{\link{input_prep}()},
-\code{\link{xlsx_write_implan}()}
+\code{\link{input_write}()}
 }
 \concept{functions for implan input}
