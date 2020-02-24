@@ -164,6 +164,6 @@ input <- function(dat, filename, event_year, ...) {
         lapply(function(df) {
             dim_vals <- select(df, !!! dims) %>% head(1)
             dim_name <- unlist(dim_vals) %>% paste(collapse = "")
-            prep_write(df, filename, dim_name)
+            prep_write(df, dim_name)
         })
 }
