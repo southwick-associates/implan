@@ -150,9 +150,9 @@ input_write <- function(ls, filename) {
 input <- function(dat, filename, event_year, ...) {
     # wrapping prep & write steps into one function
     prep_write <- function(df, dim_name = "") {
-        input_prep_ind(df, paste0(dim_name, "Ind"), event_year) %>%
-            input_write(filename)
         input_prep_comm(df, paste0(dim_name, "Comm"), event_year) %>%
+            input_write(filename)
+        input_prep_ind(df, paste0(dim_name, "Ind"), event_year) %>%
             input_write(filename)
     }
     dims <- enquos(...)

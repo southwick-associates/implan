@@ -10,7 +10,7 @@ The implan package streamlines several steps otherwise done in Excel:
 2.  [Input](#2-input-write-to-excel): Write Excel tabs for Implan import
     using `implan::input()`
 3.  [Output](#3-output-read-from-implan): Pull all Implan output (csv)
-    into a table using `implan::output_read_csv()`
+    into a table using `implan::output()`
 
 ### Elevator Pitch
 
@@ -20,7 +20,7 @@ checks/summaries. You can see a production example for B4W-19-01:
 [implan-input](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/1-implan-input.R),
 [contributions](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/2-contributions.R)
 
-### Resources
+### Reference
 
 There is an Office 365 group with useful files ([O365 \>
 Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan))
@@ -33,7 +33,7 @@ in this package (details in [the last section](#excel-approach)).
 The implan package includes example data for demonstration. The starting
 point is a table of total spending estimates by activity-type-item. The
 `activity_group` variable is included for joining with the
-item\_to\_category crosswalk table described below.
+item-to-category crosswalk table described below.
 
 ``` r
 library(dplyr)
@@ -60,8 +60,8 @@ spending
 ## 1\. Prepare Implan Sector Allocation
 
 Allocating spending to Implan sectors requires a spending table and 2
-crosswalk tables. The implan package includes example data to
-demonstrate the allocation process:
+crosswalk tables. The implan package includes crosswalk tables to
+demonstrate the allocation process.
 
 ### Item to Category
 
@@ -146,14 +146,21 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## 2\. Input Write to Excel
 
+Writing to Excel (for Implan import) can do done with the `input()`
+function. This function wraps two steps that I think are worth
+distinguishing:
+
+### input\_prep()
+
 To prepare for implan import, we first convert spending by sector to the
-necessary Industry/Commodity format using `input_prep_ind()`. Each
+necessary Industry/Commodity format using `input_prep()` (which has
+separate convenience functions for Industry and Commodity). Each
 destination Excel tab requires two tables (header & data), so
-`input_prep_ind()` returns a list of two data frames.:
+`input_prep()` returns a list of two data frames.:
 
 ``` r
-ind <- input_prep_ind(spend_sector, "Ind")
-comm <- input_prep_comm(spend_sector, "Comm")
+ind <- input_prep_ind(spend_sector, activity_name = "Ind", event_year = 2019)
+comm <- input_prep_comm(spend_sector, activity_name = "Comm", event_year = 2019)
 
 comm$header
 #> # A tibble: 1 x 4
@@ -169,68 +176,72 @@ head(comm$dat, 2)
 #> 2   3003     21865892.      2019 Yes                          1
 ```
 
-After prepartion, the data can be written to Excel with
-`xlsx_write_implan()`. Note that when you are ready for Implan import,
-you’ll first need to open the `.xlsx` file and save to the legacy `.xls`
-format which Implan requires.
+### input\_write()
+
+After prepartion, the data can be written to Excel with `input_write()`.
+Note that when you are ready for Implan import, you’ll first need to
+open the `.xlsx` file and save to the legacy `.xls` format which Implan
+requires.
 
 ``` r
-xlsx_write_implan(comm, "tmp.xlsx")
-xlsx_write_implan(ind, "tmp.xlsx")
+input_write(comm, "tmp.xlsx")
+input_write(ind, "tmp.xlsx")
 
 openxlsx::getSheetNames("tmp.xlsx")
 #> [1] "Comm" "Ind"
 ```
 
-It’s also easy to create multiple Excel sheets corresponding to whatever
-dimensions are required for the project. For example, by activity:
+### input()
+
+In practice it’s useful to wrap the prep/write steps into a single
+function:
 
 ``` r
-acts <- sort(unique(spend_sector$act))
-for (i in acts) {
-    df <- filter(spend_sector, act == i)
-    input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan("tmp2.xlsx")
-    input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan("tmp2.xlsx")
-}
+input(spend_sector, "tmp2.xlsx", 2019)
 openxlsx::getSheetNames("tmp2.xlsx")
+#> [1] "Ind"  "Comm"
+```
+
+The `input()` function also allows grouping at an arbitrary number of
+dimensions, which get written to separate Excel sheets. For example, we
+could split the results by `act` and `type`:
+
+``` r
+input(spend_sector, "tmp3.xlsx", 2019, act, type)
+openxlsx::getSheetNames("tmp3.xlsx")
+#>  [1] "bikeequipInd"      "bikeequipComm"     "biketripInd"      
+#>  [4] "biketripComm"      "campequipInd"      "campequipComm"    
+#>  [7] "camptripInd"       "camptripComm"      "fishequipInd"     
+#> [10] "fishequipComm"     "fishtripInd"       "fishtripComm"     
+#> [13] "huntequipInd"      "huntequipComm"     "hunttripInd"      
+#> [16] "hunttripComm"      "picnictripInd"     "picnictripComm"   
+#> [19] "snowequipInd"      "snowequipComm"     "snowtripInd"      
+#> [22] "snowtripComm"      "trailequipInd"     "trailequipComm"   
+#> [25] "trailtripInd"      "trailtripComm"     "waterequipInd"    
+#> [28] "waterequipComm"    "watertripInd"      "watertripComm"    
+#> [31] "wildlifeequipInd"  "wildlifeequipComm" "wildlifetripInd"  
+#> [34] "wildlifetripComm"
+```
+
+In practice we might want to delineate one of these dimensions with
+separate Excel files. That’s easily accomplished using a for loop:
+
+``` r
+for (i in c("equip", "trip")) {
+    dat <- filter(spend_sector, type == i)
+    filename <- paste0("tmp-", i, ".xlsx")
+    input(dat, filename, 2019, act)
+}
+list.files(pattern = "\\.xlsx")
+#> [1] "tmp-equip.xlsx" "tmp-trip.xlsx"  "tmp.xlsx"       "tmp2.xlsx"     
+#> [5] "tmp3.xlsx"
+
+openxlsx::getSheetNames("tmp-trip.xlsx")
 #>  [1] "bikeInd"      "bikeComm"     "campInd"      "campComm"     "fishInd"     
 #>  [6] "fishComm"     "huntInd"      "huntComm"     "picnicInd"    "picnicComm"  
 #> [11] "snowInd"      "snowComm"     "trailInd"     "trailComm"    "waterInd"    
 #> [16] "waterComm"    "wildlifeInd"  "wildlifeComm"
 ```
-
-And, of course, we can further scale-up the dimensions. For example,
-let’s assume we also need to save multiple excel files, trip vs equip
-separately. Here I first make a function to wrap the by-activity loop
-above. I also generalized it to work at any dimension since I suspect it
-could be useful for multiple projects. The function can then be applied
-to produce multiple Excel files:
-
-``` r
-# write implan sheets an excel file, one sheet per dimension for each group (Ind vs Comm)
-write_dims <- function(spend_sector, outfile, dimension = "act") {
-    dims <- sort(unique(spend_sector[[dimension]]))
-    for (i in dims) {
-        df <- filter(spend_sector, .data[[dimension]] == i)
-        input_prep_ind(df, paste0(i, "Ind")) %>% xlsx_write_implan(outfile)
-        input_prep_comm(df, paste0(i, "Comm")) %>% xlsx_write_implan(outfile)
-    }
-}
-for (i in c("trip", "equip")) {
-    write_dims(
-        spend_sector = filter(spend_sector, type == i),
-        outfile = paste0("tmp-", i, ".xlsx")
-    )
-}
-list.files(pattern = "\\.xlsx")
-#> [1] "tmp-equip.xlsx" "tmp-trip.xlsx"  "tmp.xlsx"       "tmp2.xlsx"
-```
-
-Note that for the above code, we could have used a nested loop with two
-iterators (e.g., i,j). I tend to avoid such nesting because things can
-get confusing quickly. Making code more modular (by using functions)
-tends to make it more intelligible and portable (e.g., to other
-projects).
 
 ## 3\. Output Read from Implan
 
@@ -316,9 +327,9 @@ included a basic example (for wildlife watching) in this package:
 
 ``` r
 filepath <- system.file(
-  "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
+  "extdata", "templates", "fhwar-implan-import.xls", package = "implan"
 )
-file.copy(filepath, "tmp.xls") # copy to your working directory
+file.copy(filepath, "tmp-input.xls") # copy to your working directory
 #> [1] TRUE
 ```
 
@@ -327,8 +338,8 @@ sheet and running embedded macros:
 
 ``` r
 filepath <- system.file(
-  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
+  "extdata", "templates", "implan-output.xlsm", package = "implan"
 )
-file.copy(filepath, "tmp.xlsm") # copy to your working directory
+file.copy(filepath, "tmp-output.xlsm")
 #> [1] TRUE
 ```

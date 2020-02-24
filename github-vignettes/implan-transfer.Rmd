@@ -24,7 +24,7 @@ The implan package streamlines several steps otherwise done in Excel:
 
 R code can be easily scaled up/down or ported to a new project without the manual restructuring needed in Excel. It also facilitates automated checks/summaries. You can see a production example for B4W-19-01:   [implan-input](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/1-implan-input.R), [contributions](https://github.com/southwick-associates/B4W-19-01/blob/master/code/implan/2-contributions.R)
 
-### Resources
+### Reference
 
 There is an Office 365 group with useful files ([O365 > Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan)) including master sectoring schemes (i.e., category to sector crosswalks). I've also included template files from the Excel approach in this package (details in [the last section](#excel-approach)).
 
@@ -42,7 +42,7 @@ spending
 
 ## 1. Prepare Implan Sector Allocation
 
-Allocating spending to Implan sectors requires a spending table and 2 crosswalk tables. The implan package includes example data to demonstrate the allocation process:
+Allocating spending to Implan sectors requires a spending table and 2 crosswalk tables. The implan package includes crosswalk tables to demonstrate the allocation process.
 
 ### Item to Category
 
@@ -127,47 +127,25 @@ input(spend_sector, "tmp2.xlsx", 2019)
 openxlsx::getSheetNames("tmp2.xlsx")
 ```
 
-The `input()` function also allows grouping at an arbitrary number of dimensions, which are written to separate Excel sheets. For example, we could slice the results by activity and type (equip vs trip):
+The `input()` function also allows grouping at an arbitrary number of dimensions, which get written to separate Excel sheets. For example, we could split the results by `act` and `type`:
 
 ```{r}
 input(spend_sector, "tmp3.xlsx", 2019, act, type)
+openxlsx::getSheetNames("tmp3.xlsx")
 ```
 
-
-It's also easy to create multiple Excel sheets corresponding to whatever dimensions are required for the project. For example, by activity:
-
-```{r}
-acts <- sort(unique(spend_sector$act))
-for (i in acts) {
-    df <- filter(spend_sector, act == i)
-    input_prep_ind(df, paste0(i, "Ind")) %>% input_write("tmp2.xlsx")
-    input_prep_comm(df, paste0(i, "Comm")) %>% input_write("tmp2.xlsx")
-}
-openxlsx::getSheetNames("tmp2.xlsx")
-```
-
-And, of course, we can further scale-up the dimensions. For example, let's assume we also need to save multiple excel files, trip vs equip separately. Here I first make a function to wrap the by-activity loop above. I also generalized it to work at any dimension since I suspect it could be useful for multiple projects. The function can then be applied to produce multiple Excel files:
+In practice we might want to delineate one of these dimensions with separate Excel files. That's easily accomplished using a for loop:
 
 ```{r}
-# write implan sheets an excel file, one sheet per dimension for each group (Ind vs Comm)
-write_dims <- function(spend_sector, outfile, dimension = "act") {
-    dims <- sort(unique(spend_sector[[dimension]]))
-    for (i in dims) {
-        df <- filter(spend_sector, .data[[dimension]] == i)
-        input_prep_ind(df, paste0(i, "Ind")) %>% input_write(outfile)
-        input_prep_comm(df, paste0(i, "Comm")) %>% input_write(outfile)
-    }
-}
-for (i in c("trip", "equip")) {
-    write_dims(
-        spend_sector = filter(spend_sector, type == i),
-        outfile = paste0("tmp-", i, ".xlsx")
-    )
+for (i in c("equip", "trip")) {
+    dat <- filter(spend_sector, type == i)
+    filename <- paste0("tmp-", i, ".xlsx")
+    input(dat, filename, 2019, act)
 }
 list.files(pattern = "\\.xlsx")
-```
 
-Note that for the above code, we could have used a nested loop with two iterators (e.g., i,j). I tend to avoid such nesting because things can get confusing quickly. Making code more modular (by using functions) tends to make it more intelligible and portable (e.g., to other projects).
+openxlsx::getSheetNames("tmp-trip.xlsx")
+```
 
 ## 3. Output Read from Implan
 
@@ -218,17 +196,17 @@ The Excel approach combines steps 1 & 2 into an Excel workbook. I included a bas
 
 ```{r}
 filepath <- system.file(
-  "extdata", "templates", "fhwar-implan-import.xls", package = "implan", mustWork = TRUE
+  "extdata", "templates", "fhwar-implan-import.xls", package = "implan"
 )
-file.copy(filepath, "tmp.xls") # copy to your working directory
+file.copy(filepath, "tmp-input.xls") # copy to your working directory
 ```
 
 Step 3 can be accomplished by copy/pasting implan results into an Excel sheet and running embedded macros:
 
 ```{r}
 filepath <- system.file(
-  "extdata", "templates", "implan-output.xlsm", package = "implan", mustWork = TRUE
+  "extdata", "templates", "implan-output.xlsm", package = "implan"
 )
-file.copy(filepath, "tmp.xlsm") # copy to your working directory
+file.copy(filepath, "tmp-output.xlsm")
 ```
 
