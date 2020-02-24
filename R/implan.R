@@ -1,5 +1,5 @@
 # package-level documentation
 
 #' @import dplyr
-#' @importFrom utils tail
+#' @importFrom utils tail head
 NULL
