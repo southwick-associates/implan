@@ -5,11 +5,11 @@
 
 The implan package streamlines several steps otherwise done in Excel:
 
-1.  [Prepare](#prepare-implan-sector-allocation): Allocate spending by
+1.  [Prepare](#1-prepare-implan-sector-allocation): Allocate spending by
     Implan sector and validate using `implan::check` functions.
-2.  [Input](#input-write-to-excel): Write Excel tabs for Implan import
+2.  [Input](#2-input-write-to-excel): Write Excel tabs for Implan import
     using `implan::input()`
-3.  [Output](#output-read-from-implan): Pull all Implan output (csv)
+3.  [Output](#3-output-read-from-implan): Pull all Implan output (csv)
     into a table using `implan::output_read_csv()`
 
 ### Elevator Pitch
@@ -25,16 +25,15 @@ checks/summaries. You can see a production example for B4W-19-01:
 There is an Office 365 group with useful files ([O365 \>
 Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan))
 including master sectoring schemes (i.e., category to sector
-crosswalks).
+crosswalks). I’ve also included template files from the Excel approach
+in this package (details in [the last section](#excel-approach)).
 
-I’ve also included template files from the Excel approach in this
-package (details in [the last section](#excel-approach)).
+### Example Data
 
-## 1\. Prepare Implan Sector Allocation
-
-Allocating spending to Implan sectors requires a spending table and 2
-crosswalk tables. The implan package includes example data to
-demonstrate the allocation process:
+The implan package includes example data for demonstration. The starting
+point is a table of total spending estimates by activity-type-item. The
+`activity_group` variable is included for joining with the
+item\_to\_category crosswalk table described below.
 
 ``` r
 library(dplyr)
@@ -58,13 +57,24 @@ spending
 #> # ... with 202 more rows
 ```
 
+## 1\. Prepare Implan Sector Allocation
+
+Allocating spending to Implan sectors requires a spending table and 2
+crosswalk tables. The implan package includes example data to
+demonstrate the allocation process:
+
 ### Item to Category
 
 Spending must first be reallocated from the item level (e.g., from
-survey data) to the category level (e.g., “Food - Groceries”, etc.). The
-spending crosswalk is specified by 3 dimensions (`activity_group`,
-`type`, `item`) for which `share` in the crosswalk table must sum to
-100%:
+survey data) to the category level (e.g., “Food - Groceries”, etc.)
+using an item-to-category crosswalk.
+
+Items in the example data mostly have a 1-to-1 correspondence with
+categories, but several need to be split into multiple categories (e.g.,
+food), so we need a `share` variable to specify the breakout
+percentages. The crosswalk is specified by 3 dimensions
+(`activity_group`, `type`, `item`) across which `share` must sum to
+100%. We can confirm this using `check_share_sums()`:
 
 ``` r
 data(item_to_category)
@@ -80,8 +90,10 @@ check_share_sums(df = item_to_category, sharevar = share, activity_group, type, 
 #> [1] TRUE
 ```
 
-Allocating is a simple matter of joining with the crosswalk table and
-multiplying:
+Allocating is a simple matter of joining the spending and crosswalk
+tables and then multiplying. We can use `check_spend_sums()` to confirm
+that expenditures still sum to the correct quantities after we modify
+the data.
 
 ``` r
 spend_category <- spending %>%
@@ -104,10 +116,13 @@ check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend,
 
 ### Category to Sector
 
-In the same way, allocating to sectors uses a crosswalk at the
-`category` dimension (also referred to as implan sectoring schemes, with
-up-to-date versions stored in [O365 \> Implan \> Sectoring
-Schemes](https://southwickassociatesinc.sharepoint.com/:f:/s/Implan/EnL9nwfijuROuo34BCV47fkB9yuOh8l0lDdaEtmEfL9TNA?e=R2dby9)):
+In the same way, allocating to sectors uses a category-to-sector
+crosswalk (also referred to as an implan sectoring scheme). Note that
+dated versions of sectoring schemes are stored in [O365 \> Implan \>
+Sectoring
+Schemes](https://southwickassociatesinc.sharepoint.com/:f:/s/Implan/EnL9nwfijuROuo34BCV47fkB9yuOh8l0lDdaEtmEfL9TNA?e=R2dby9))
+and these can be used directly (or with minor modifications) for any
+given project.
 
 ``` r
 data(category_to_sector546)

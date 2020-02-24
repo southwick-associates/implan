@@ -16,9 +16,9 @@ library(implan)
 
 The implan package streamlines several steps otherwise done in Excel:
 
-1. [Prepare](#prepare-implan-sector-allocation): Allocate spending by Implan sector and validate using `implan::check` functions.
-2. [Input](#input-write-to-excel): Write Excel tabs for Implan import using `implan::input()`
-3. [Output](#output-read-from-implan): Pull all Implan output (csv) into a table using `implan::output_read_csv()`
+1. [Prepare](#1-prepare-implan-sector-allocation): Allocate spending by Implan sector and validate using `implan::check` functions.
+2. [Input](#2-input-write-to-excel): Write Excel tabs for Implan import using `implan::input()`
+3. [Output](#3-output-read-from-implan): Pull all Implan output (csv) into a table using `implan::output_read_csv()`
 
 ### Elevator Pitch
 
@@ -26,9 +26,7 @@ R code can be easily scaled up/down or ported to a new project without the manua
 
 ### Resources
 
-There is an Office 365 group with useful files ([O365 > Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan)) including master sectoring schemes (i.e., category to sector crosswalks).
-
-I've also included template files from the Excel approach in this package (details in [the last section](#excel-approach)).
+There is an Office 365 group with useful files ([O365 > Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan)) including master sectoring schemes (i.e., category to sector crosswalks). I've also included template files from the Excel approach in this package (details in [the last section](#excel-approach)).
 
 ### Example Data
 
