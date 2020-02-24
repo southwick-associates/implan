@@ -2,6 +2,7 @@
 
 export(check_share_sums)
 export(check_spend_sums)
+export(input)
 export(input_header)
 export(input_prep)
 export(input_prep_comm)

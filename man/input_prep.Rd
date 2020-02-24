@@ -6,11 +6,11 @@
 \alias{input_prep_comm}
 \title{Prepare spending by sector for Excel implan import}
 \usage{
-input_prep(dat, activity_name, event_year = 2019, group)
+input_prep(dat, activity_name, event_year, group)
 
-input_prep_ind(dat, activity_name, event_year = 2019)
+input_prep_ind(dat, activity_name, event_year)
 
-input_prep_comm(dat, activity_name, event_year = 2019)
+input_prep_comm(dat, activity_name, event_year)
 }
 \arguments{
 \item{dat}{data frame with spending by sector with 4 required columns:
@@ -56,17 +56,25 @@ spend_sector <- spend_category \%>\%
 check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 
 # allocate for implan import (Industry)
-comm <- input_prep_comm(spend_sector, "huntComm")
-ind <- input_prep_ind(spend_sector, "huntInd")
+comm <- input_prep_comm(spend_sector, "huntComm", 2019)
+ind <- input_prep_ind(spend_sector, "huntInd", 2019)
 ind
 
 # write to an excel worksheet
-xlsx_write_implan(ind, "tmp.xlsx")
 # you'll need to manually save as ".xls" (in Excel) from Implan import
+\dontrun{
+xlsx_write_implan(ind, "tmp.xlsx")
+}
+
+# write sheets by activity-type
+\dontrun{
+input(spend_sector, "tmp2.xlsx", 2019, act, type)
+}
 }
 \seealso{
 Other functions for implan input: 
 \code{\link{input_header}()},
+\code{\link{input}()},
 \code{\link{xlsx_write_implan}()}
 }
 \concept{functions for implan input}

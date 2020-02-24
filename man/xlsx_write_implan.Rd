@@ -20,6 +20,7 @@ Write data to a sheet for Excel Implan import
 \seealso{
 Other functions for implan input: 
 \code{\link{input_header}()},
-\code{\link{input_prep}()}
+\code{\link{input_prep}()},
+\code{\link{input}()}
 }
 \concept{functions for implan input}

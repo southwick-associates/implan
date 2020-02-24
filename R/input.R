@@ -52,14 +52,21 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' check_spend_sums(spend_category, spend_sector, spend, type, item, category)
 #'
 #' # allocate for implan import (Industry)
-#' comm <- input_prep_comm(spend_sector, "huntComm")
-#' ind <- input_prep_ind(spend_sector, "huntInd")
+#' comm <- input_prep_comm(spend_sector, "huntComm", 2019)
+#' ind <- input_prep_ind(spend_sector, "huntInd", 2019)
 #' ind
 #'
 #' # write to an excel worksheet
-#' xlsx_write_implan(ind, "tmp.xlsx")
 #' # you'll need to manually save as ".xls" (in Excel) from Implan import
-input_prep <- function(dat, activity_name, event_year = 2019, group) {
+#' \dontrun{
+#' xlsx_write_implan(ind, "tmp.xlsx")
+#' }
+#'
+#' # write sheets by activity-type
+#' \dontrun{
+#' input(spend_sector, "tmp2.xlsx", 2019, act, type)
+#' }
+input_prep <- function(dat, activity_name, event_year, group) {
     # collapse to sector-retail & add variables that might be needed
     sector_group <- group # to ensure the filter works correctly
     dat <- dat %>%
@@ -91,13 +98,13 @@ input_prep <- function(dat, activity_name, event_year = 2019, group) {
 
 #' @describeIn input_prep Prepare industry data
 #' @export
-input_prep_ind <- function(dat, activity_name, event_year = 2019) {
+input_prep_ind <- function(dat, activity_name, event_year) {
     input_prep(dat, activity_name, event_year, "Ind")
 }
 
 #' @describeIn input_prep Prepare commodity data
 #' @export
-input_prep_comm <- function(dat, activity_name, event_year = 2019) {
+input_prep_comm <- function(dat, activity_name, event_year) {
     input_prep(dat, activity_name, event_year, "Comm")
 }
 
@@ -123,4 +130,40 @@ xlsx_write_implan <- function(ls, filename) {
     openxlsx::writeData(wb, sheet = sheet, ls$header)
     openxlsx::writeData(wb, sheet = sheet, ls$dat, startRow = 4)
     openxlsx::saveWorkbook(wb, filename, overwrite = TRUE)
+}
+
+#' Write spending to Excel for Implan import
+#'
+#' This writes separate sheets for commodity and industry by wrapping
+#' \code{\link{input_prep}} and \code{\link{xlsx_write_implan}}. The dots
+#' argument allows for an arbitrary number of grouping dimensions (for separate
+#' sheets by dimensions).
+#'
+#' @inheritParams input_prep
+#' @inheritParams xlsx_write_implan
+#' @param ... Optional grouping variables (unquoted) for separating sheets
+#' across one or more dimensions
+#' @family functions for implan input
+#' @export
+#' @examples
+#' # see ?input_prep()
+input <- function(dat, filename, event_year, ...) {
+    # wrapping prep & write steps into one function
+    prep_write <- function(dat, filename, dim_name = "") {
+        input_prep_ind(dat, paste0(dim_name, "Ind"), event_year) %>%
+            xlsx_write_implan(filename)
+        input_prep_comm(dat, paste0(dim_name, "Comm"), event_year) %>%
+            xlsx_write_implan(filename)
+    }
+    dims <- enquos(...)
+    if (length(dims) == 0) {
+        prep_write(dat, filename)
+        return(invisible())
+    }
+    out <- group_split(dat, !!! dims) %>%
+        lapply(function(x) {
+            dim_vals <- select(x, !!! dims) %>% head(1)
+            dim_name <- unlist(dim_vals) %>% paste(collapse = "")
+            prep_write(x, filename, dim_name)
+        })
 }
