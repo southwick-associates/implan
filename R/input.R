@@ -41,9 +41,9 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' data(spending, item_to_category)
 #'
 #' spend_category <- spending %>%
-#'     left_join(item_to_category, by = c("type", "item")) %>%
+#'     left_join(item_to_category, by = c("activity_group", "type", "item")) %>%
 #'     mutate(spend = spend * share)
-#' check_spend_sums(spending, spend_category, spend, type, item)
+#' check_spend_sums(spending, spend_category, spend, activity_group, type, item)
 #'
 #' spend_sector <- spend_category %>%
 #'     select(-share) %>%
