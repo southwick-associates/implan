@@ -1,6 +1,6 @@
 
 local({
-
+  
   # the requested version of renv
   version <- "0.9.3"
 
