@@ -62,9 +62,10 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' input_write(ind, "tmp.xlsx")
 #' }
 #'
-#' # write sheets by activity-type
+#' # write sheets by activity
 #' \dontrun{
-#' input(spend_sector, "tmp2.xlsx", 2019, act, type)
+#' input(spend_sector, "tmp2.xlsx", 2019, act)
+#' check_implan_sums(spend_sector, "tmp2.xlsx", act, print_compare = TRUE)
 #' }
 input_prep <- function(dat, activity_name, event_year, group) {
     # collapse to sector-retail & add variables that might be needed
@@ -168,6 +169,42 @@ input <- function(dat, filename, event_year, ...) {
         })
 }
 
-check_implan_sums <- function() {
+#' Check whether the implan Excel sheets match spending by Ind/Comm
+#' 
+#' This is intended to be called after \code{\link{input}}. It checks sums for
+#' "Ind" and "Comm" separately, based on grouping supplied by the dots argument.
+#' 
+#' @inheritParams input
+#' @param print_compare If TRUE, show comparison between the 2 summaries
+#' @family functions for implan input
+#' @export
+#' @examples 
+#' # see ?input_prep
+check_implan_sums <- function(dat, filename, ..., print_compare = FALSE) {
+    dims <- enquos(...)
+    dat_grp <- dat %>%
+        group_by(!!! dims, .data$group)
     
+    dat_sums <- dat_grp %>% 
+        summarise(spend = sum(.data$spend)) %>%
+        ungroup()
+    
+    file_sums <- sapply(1:nrow(dat_sums), function(i) {
+        grp <- dat_sums[i, ] %>% select(-.data$spend)
+        sheetname <- unlist(grp) %>% paste(collapse = "")
+        grp$spend <- filename %>%
+            openxlsx::readWorkbook(sheetname, startRow = 3) %>%
+            pull(.data$Event.Value) %>%
+            sum()
+        grp
+    }, simplify = FALSE) %>% bind_rows()
+    
+    compare <- full_join(
+        dat_sums, file_sums, by = group_vars(dat_grp), 
+        suffix = c("_dat", "_file")
+    )
+    if (print_compare) {
+        print(data.frame(compare))
+    }
+    all.equal(compare$spend_dat, compare$spend_file)
 }

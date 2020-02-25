@@ -19,6 +19,7 @@ Write data to a sheet for Excel Implan import
 }
 \seealso{
 Other functions for implan input: 
+\code{\link{check_implan_sums}()},
 \code{\link{input_header}()},
 \code{\link{input_prep}()},
 \code{\link{input}()}

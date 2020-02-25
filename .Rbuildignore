@@ -6,6 +6,7 @@
 ^README\.md$
 ^data-raw$
 ^tmp\.xlsx$
+^tmp2\.xlsx$
 ^tmp\.xls$
 ^github-vignettes$
 ^tmp$

@@ -21,6 +21,7 @@ This is a convenience function called from \code{\link{input_prep}}
 }
 \seealso{
 Other functions for implan input: 
+\code{\link{check_implan_sums}()},
 \code{\link{input_prep}()},
 \code{\link{input_write}()},
 \code{\link{input}()}
