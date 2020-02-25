@@ -167,3 +167,7 @@ input <- function(dat, filename, event_year, ...) {
             prep_write(df, dim_name)
         })
 }
+
+check_implan_sums <- function() {
+    
+}
