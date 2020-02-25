@@ -143,7 +143,9 @@ for (i in c("equip", "trip")) {
     dat <- filter(spend_sector, type == i)
     filename <- paste0("tmp-", i, ".xlsx")
     input(dat, filename, 2019, act)
+    check_implan_sums(dat, filename, act) %>% print()
 }
+
 openxlsx::getSheetNames("tmp-trip.xlsx")
 ```
 
