@@ -186,11 +186,16 @@ openxlsx::getSheetNames("tmp.xlsx")
 ```
 
 It’s convenient to wrap the prep/write steps into a single function for
-production. Note that for Implan import, you’ll first need to open the
-`.xlsx` file and save to the legacy `.xls` format which Implan requires.
+production. To be on the safe side, we can also run
+`check_implan_sums()` to ensure the Excel data look correct. Note that
+for Implan import, you’ll first need to open the `.xlsx` file and save
+to the legacy `.xls` format which Implan requires.
 
 ``` r
 input(spend_sector, "tmp2.xlsx", 2019)
+check_implan_sums(spend_sector, "tmp2.xlsx") # should print TRUE
+#> [1] TRUE
+
 openxlsx::getSheetNames("tmp2.xlsx")
 #> [1] "Comm" "Ind"
 ```
@@ -201,6 +206,9 @@ could split the results by `act` and `type`:
 
 ``` r
 input(spend_sector, "tmp3.xlsx", 2019, act, type)
+check_implan_sums(spend_sector, "tmp3.xlsx", act, type)
+#> [1] TRUE
+
 openxlsx::getSheetNames("tmp3.xlsx")
 #>  [1] "bikeequipComm"     "bikeequipInd"      "biketripComm"     
 #>  [4] "biketripInd"       "campequipComm"     "campequipInd"     
