@@ -29,12 +29,11 @@ including master sectoring schemes (i.e., category to sector
 crosswalks). I’ve also included template files from the Excel approach
 in this package (details in [the last section](#excel-approach)).
 
-### Example Data
+## 1\. Prepare Implan Sector Allocation
 
-The implan package includes example data for demonstration. The starting
-point is a table of total spending estimates by activity-type-item. The
-`activity_group` variable is included for joining with the
-item-to-category crosswalk table described below.
+Allocating spending to Implan sectors requires two crosswalk tables (
+`item_to_category`, `category_to_sector`). The starting point is a table
+of total spending estimates by activity-type-item:
 
 ``` r
 library(dplyr)
@@ -58,23 +57,11 @@ spending
 #> # ... with 202 more rows
 ```
 
-## 1\. Prepare Implan Sector Allocation
-
-Allocating spending to Implan sectors requires a spending table and 2
-crosswalk tables: item-to-category, category-to-sector.
-
 ### Item to Category
 
 Spending must first be reallocated from the item level (e.g., from
 survey data) to the category level (e.g., “Food - Groceries”, etc.)
-using an item-to-category crosswalk.
-
-Items in the example data mostly have a 1-to-1 correspondence with
-categories, but several need to be split into multiple categories (e.g.,
-food), so we need a `share` variable to specify the breakout
-percentages. The crosswalk is specified by 3 dimensions
-(`activity_group`, `type`, `item`) across which share must sum to 100%.
-We can confirm this using `check_share_sums()`:
+using an item-to-category crosswalk:
 
 ``` r
 data(item_to_category)
@@ -84,16 +71,22 @@ head(item_to_category, 2)
 #>   <chr>          <chr> <chr> <chr>             <dbl>
 #> 1 oia            trip  food  Food - Restaurant 0.570
 #> 2 oia            trip  food  Food - Groceries  0.43
+```
 
+Items in the example data mostly have a 1-to-1 correspondence with
+categories, but several need to be split into multiple categories. The
+crosswalk is specified by three dimensions (activity\_group, type, item)
+across which share must sum to 100%. We can confirm this using
+`check_share_sums()`:
+
+``` r
 # check the share variable - should print "TRUE"
 check_share_sums(df = item_to_category, sharevar = share, activity_group, type, item)
 #> [1] TRUE
 ```
 
 Allocating is a simple matter of joining the spending and crosswalk
-tables and then multiplying. We can use `check_spend_sums()` to confirm
-that expenditures still sum to the correct quantities after we modify
-the data.
+tables and then multiplying:
 
 ``` r
 spend_category <- spending %>%
@@ -107,7 +100,12 @@ head(spend_category, 2)
 #>   <chr>          <chr>  <chr> <chr>      <dbl> <chr>            
 #> 1 oia            picnic trip  food  169418242. Food - Restaurant
 #> 2 oia            picnic trip  food  127806744. Food - Groceries
+```
 
+We can use `check_spend_sums()` to confirm that expenditures still sum
+to the correct quantities after we modify the data:
+
+``` r
 # check the spending allocation - should print "TRUE"
 check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, 
                  activity_group, type, item)
@@ -135,7 +133,9 @@ head(category_to_sector546, 2)
 
 check_share_sums(category_to_sector546, sharevar = share, category)
 #> [1] TRUE
+```
 
+``` r
 spend_sector <- spend_category %>%
     left_join(category_to_sector546, by = "category") %>%
     mutate(spend = spend * share)
@@ -146,14 +146,12 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## 2\. Input Write to Excel
 
-Writing to Excel (for Implan import) can do done with the `input()`
+Writing to Excel (for Implan import) can be done with the `input()`
 function. This function combines two steps that are worth
 distinguishing:
 
   - `input_prep()` converts spending by sector to the two tables
     (header, data) needed in each Excel sheet
-
-  - `input_write()` adds the prepared data to an Excel file
 
 <!-- end list -->
 
@@ -173,7 +171,13 @@ head(comm$dat, 2)
 #>    <dbl>         <dbl>     <dbl> <chr>                    <dbl>
 #> 1   3002      1794094.      2019 Yes                          1
 #> 2   3003     21865892.      2019 Yes                          1
+```
 
+  - `input_write()` adds the prepared data to an Excel file
+
+<!-- end list -->
+
+``` r
 input_write(comm, "tmp.xlsx")
 input_write(ind, "tmp.xlsx")
 
@@ -182,17 +186,14 @@ openxlsx::getSheetNames("tmp.xlsx")
 ```
 
 It’s convenient to wrap the prep/write steps into a single function for
-production.
+production. Note that for Implan import, you’ll first need to open the
+`.xlsx` file and save to the legacy `.xls` format which Implan requires.
 
 ``` r
 input(spend_sector, "tmp2.xlsx", 2019)
-
 openxlsx::getSheetNames("tmp2.xlsx")
 #> [1] "Comm" "Ind"
 ```
-
-Note that for Implan import, you’ll first need to open the `.xlsx` file
-and save to the legacy `.xls` format which Implan requires.
 
 The `input()` function also allows grouping at an arbitrary number of
 dimensions, which get written to separate Excel sheets. For example, we
@@ -200,7 +201,6 @@ could split the results by `act` and `type`:
 
 ``` r
 input(spend_sector, "tmp3.xlsx", 2019, act, type)
-
 openxlsx::getSheetNames("tmp3.xlsx")
 #>  [1] "bikeequipComm"     "bikeequipInd"      "biketripComm"     
 #>  [4] "biketripInd"       "campequipComm"     "campequipInd"     
@@ -225,11 +225,6 @@ for (i in c("equip", "trip")) {
     filename <- paste0("tmp-", i, ".xlsx")
     input(dat, filename, 2019, act)
 }
-
-list.files(pattern = "\\.xlsx")
-#> [1] "tmp-equip.xlsx" "tmp-trip.xlsx"  "tmp.xlsx"       "tmp2.xlsx"     
-#> [5] "tmp3.xlsx"
-
 openxlsx::getSheetNames("tmp-trip.xlsx")
 #>  [1] "bikeComm"     "bikeInd"      "campComm"     "campInd"      "fishComm"    
 #>  [6] "fishInd"      "huntComm"     "huntInd"      "picnicComm"   "picnicInd"   
@@ -269,9 +264,6 @@ its two subprocesses for illustration:
     correspond to a title row that Implan includes in the output csv
     files
 
-  - `output_combine()` aggregates the tax results and appends to the
-    overall summary
-
 <!-- end list -->
 
 ``` r
@@ -282,7 +274,14 @@ names(dat)
 #> [3] "state and local tax impact by direct"
 #> [4] "state and local tax impact by total" 
 #> [5] "impact summary"
+```
 
+  - `output_combine()` aggregates the tax results and appends to the
+    overall summary
+
+<!-- end list -->
+
+``` r
 output_combine(dat)
 #> # A tibble: 4 x 7
 #>   ImpactType    Employment LaborIncome TotalValueAdded   Output  FedTax LocalTax
@@ -294,20 +293,25 @@ output_combine(dat)
 ```
 
 In practice we’ll usually want to pull multiple activities. This is
-easily accomplished with `output()`:
+easily accomplished with `output()` because it will parse out the
+directories and store their names in a “dimension” variable:
 
 ``` r
 list.files(output_dir)
 #> [1] "bike" "hunt"
 
 df <- output(output_dir)
-
-count(df, dimension)
-#> # A tibble: 2 x 2
-#>   dimension     n
-#>   <chr>     <int>
-#> 1 bike          4
-#> 2 hunt          4
+glimpse(df)
+#> Observations: 8
+#> Variables: 8
+#> $ ImpactType      <chr> "Direct Effect", "Indirect Effect", "Induced Effect...
+#> $ Employment      <dbl> 2893.4122, 807.9625, 962.0801, 4663.4548, 1694.1600...
+#> $ LaborIncome     <dbl> 113060079, 54793181, 48677587, 216530848, 51488607,...
+#> $ TotalValueAdded <dbl> 185259583, 82309563, 88529239, 356098385, 77127905,...
+#> $ Output          <dbl> 340859796, 160323464, 152913486, 654096746, 1476797...
+#> $ FedTax          <dbl> 26130695, NA, NA, 48060734, 11001048, NA, NA, 20375212
+#> $ LocalTax        <dbl> 31961988, NA, NA, 46878467, 9377690, NA, NA, 15554404
+#> $ dimension       <chr> "bike", "bike", "bike", "bike", "hunt", "hunt", "hu...
 ```
 
 The `output()` function also arbitrarily scales up to multiple
@@ -316,8 +320,10 @@ activity) which we can use to demonstrate:
 
 ``` r
 output_dir <- system.file("extdata", "output", package = "implan")
-df <- output(output_dir)
+list.files(output_dir)
+#> [1] "region1" "region2"
 
+df <- output(output_dir)
 count(df, dimension)
 #> # A tibble: 4 x 2
 #>   dimension        n
@@ -334,7 +340,6 @@ variables:
 ``` r
 library(tidyr)
 df <- separate(df, dimension, c("region", "act"))
-
 count(df, region, act)
 #> # A tibble: 4 x 3
 #>   region  act       n

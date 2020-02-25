@@ -28,9 +28,9 @@ R code can be easily scaled up/down or ported to a new project without the manua
 
 There is an Office 365 group with useful files ([O365 > Implan](https://southwickassociatesinc.sharepoint.com/sites/Implan)) including master sectoring schemes (i.e., category to sector crosswalks). I've also included template files from the Excel approach in this package (details in [the last section](#excel-approach)).
 
-### Example Data
+## 1. Prepare Implan Sector Allocation
 
-The implan package includes example data for demonstration. The starting point is a table of total spending estimates by activity-type-item. The `activity_group` variable is included for joining with the item-to-category crosswalk table described below.
+Allocating spending to Implan sectors requires two crosswalk tables ( `item_to_category`, `category_to_sector`). The starting point is a table of total spending estimates by activity-type-item:
 
 ```{r}
 library(dplyr)
@@ -40,25 +40,23 @@ data(spending) # spending by activity-type-item
 spending
 ```
 
-## 1. Prepare Implan Sector Allocation
-
-Allocating spending to Implan sectors requires a spending table and 2 crosswalk tables: item-to-category, category-to-sector.
-
 ### Item to Category
 
-Spending must first be reallocated from the item level (e.g., from survey data) to the category level (e.g., "Food - Groceries", etc.) using an item-to-category crosswalk. 
-
-Items in the example data mostly have a 1-to-1 correspondence with categories, but several need to be split into multiple categories (e.g., food), so we need a `share` variable to specify the breakout percentages. The crosswalk is specified by 3 dimensions (`activity_group`, `type`, `item`) across which share must sum to 100%. We can confirm this using `check_share_sums()`:
+Spending must first be reallocated from the item level (e.g., from survey data) to the category level (e.g., "Food - Groceries", etc.) using an item-to-category crosswalk:
 
 ```{r}
 data(item_to_category)
 head(item_to_category, 2)
+```
 
+Items in the example data mostly have a 1-to-1 correspondence with categories, but several need to be split into multiple categories. The crosswalk is specified by three dimensions (activity_group, type, item) across which share must sum to 100%. We can confirm this using `check_share_sums()`:
+
+```{r}
 # check the share variable - should print "TRUE"
 check_share_sums(df = item_to_category, sharevar = share, activity_group, type, item)
 ```
 
-Allocating is a simple matter of joining the spending and crosswalk tables and then multiplying. We can use `check_spend_sums()` to confirm that expenditures still sum to the correct quantities after we modify the data.
+Allocating is a simple matter of joining the spending and crosswalk tables and then multiplying:
 
 ```{r}
 spend_category <- spending %>%
@@ -67,7 +65,11 @@ spend_category <- spending %>%
     select(-share) # no longer needed
 
 head(spend_category, 2)
+```
 
+We can use `check_spend_sums()` to confirm that expenditures still sum to the correct quantities after we modify the data:
+
+```{r}
 # check the spending allocation - should print "TRUE"
 check_spend_sums(df_old = spending, df_new = spend_category, spendvar = spend, 
                  activity_group, type, item)
@@ -82,7 +84,9 @@ data(category_to_sector546)
 head(category_to_sector546, 2)
 
 check_share_sums(category_to_sector546, sharevar = share, category)
+```
 
+```{r}
 spend_sector <- spend_category %>%
     left_join(category_to_sector546, by = "category") %>%
     mutate(spend = spend * share)
@@ -92,11 +96,9 @@ check_spend_sums(df_old = spend_category, df_new = spend_sector, spendvar = spen
 
 ## 2. Input Write to Excel
 
-Writing to Excel (for Implan import) can do done with the `input()` function. This function combines two steps that are worth distinguishing:
+Writing to Excel (for Implan import) can be done with the `input()` function. This function combines two steps that are worth distinguishing:
 
 - `input_prep()` converts spending by sector to the two tables (header, data) needed in each Excel sheet
-
-- `input_write()` adds the prepared data to an Excel file
 
 ```{r}
 ind <- input_prep_ind(spend_sector, activity_name = "Ind", event_year = 2019)
@@ -105,28 +107,28 @@ comm <- input_prep_comm(spend_sector, activity_name = "Comm", event_year = 2019)
 comm$header
 
 head(comm$dat, 2)
+```
 
+- `input_write()` adds the prepared data to an Excel file
+
+```{r}
 input_write(comm, "tmp.xlsx")
 input_write(ind, "tmp.xlsx")
 
 openxlsx::getSheetNames("tmp.xlsx")
 ```
 
-It's convenient to wrap the prep/write steps into a single function for production. 
+It's convenient to wrap the prep/write steps into a single function for production. Note that for Implan import, you'll first need to open the `.xlsx` file and save to the legacy `.xls` format which Implan requires.
 
 ```{r}
 input(spend_sector, "tmp2.xlsx", 2019)
-
 openxlsx::getSheetNames("tmp2.xlsx")
 ```
-
-Note that for Implan import, you'll first need to open the `.xlsx` file and save to the legacy `.xls` format which Implan requires.
 
 The `input()` function also allows grouping at an arbitrary number of dimensions, which get written to separate Excel sheets. For example, we could split the results by `act` and `type`:
 
 ```{r}
 input(spend_sector, "tmp3.xlsx", 2019, act, type)
-
 openxlsx::getSheetNames("tmp3.xlsx")
 ```
 
@@ -138,9 +140,6 @@ for (i in c("equip", "trip")) {
     filename <- paste0("tmp-", i, ".xlsx")
     input(dat, filename, 2019, act)
 }
-
-list.files(pattern = "\\.xlsx")
-
 openxlsx::getSheetNames("tmp-trip.xlsx")
 ```
 
@@ -166,31 +165,33 @@ We can use the `output()` function to pull the data, but I'll break out its two 
 
 - `output_read_csv()` pulls all csv files for an activity into an R list, with one data frame per input file. The names of the list correspond to a title row that Implan includes in the output csv files
 
-- `output_combine()` aggregates the tax results and appends to the overall summary
-
 ```{r}
 dat <- output_read_csv(hunt_dir)
 names(dat)
+```
 
+- `output_combine()` aggregates the tax results and appends to the overall summary
+
+```{r}
 output_combine(dat)
 ```
 
-In practice we'll usually want to pull multiple activities. This is easily accomplished with `output()`:
+In practice we'll usually want to pull multiple activities. This is easily accomplished with `output()` because it will parse out the directories and store their names in a "dimension" variable:
 
 ```{r}
 list.files(output_dir)
 
 df <- output(output_dir)
-
-count(df, dimension)
+glimpse(df)
 ```
 
 The `output()` function also arbitrarily scales up to multiple dimensions. The example data actually includes two dimensions (region by activity) which we can use to demonstrate:
 
 ```{r}
 output_dir <- system.file("extdata", "output", package = "implan")
-df <- output(output_dir)
+list.files(output_dir)
 
+df <- output(output_dir)
 count(df, dimension)
 ```
 
@@ -199,7 +200,6 @@ It's probably more useful to have the dimensions represented by distinct variabl
 ```{r}
 library(tidyr)
 df <- separate(df, dimension, c("region", "act"))
-
 count(df, region, act)
 ```
 
