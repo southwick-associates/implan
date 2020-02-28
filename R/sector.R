@@ -47,8 +47,15 @@ sector_update <- function(
 check_share_sums <- function(df, sharevar, ...) {
     sharevar <- enquo(sharevar)
     dims <- enquos(...)
-    x <- group_by(df, !!! dims) %>% summarise(share = sum( !! sharevar))
-    all.equal(x$share, rep(1, nrow(x)))
+    x <- group_by(df, !!! dims) %>% summarise(sum_share = sum( !! sharevar))
+    
+    pass <- isTRUE(all.equal(x$sum_share, rep(1, nrow(x))))
+    if (pass) return(invisible())
+    
+    check_message_error(
+        filter(x, round(.data$sum_share, 3) != 1),
+        "The check_share_sums() didn't pass. Problem data:"
+    )
 }
 
 #' Check whether reallocated spending retains the correct sum
@@ -66,6 +73,26 @@ check_spend_sums <- function(df_old, df_new, spendvar, ...) {
     dims <- enquos(...)
     x <- group_by(df_old, !!! dims) %>% summarise(spend = sum(!! spendvar))
     y <- group_by(df_new, !!! dims) %>% summarise(spend = sum(!! spendvar))
-    all.equal(x$spend, y$spend)
+    
+    pass <- isTRUE(all.equal(x$spend, y$spend))
+    if (pass) return(invisible())
+    
+    check_message_error(
+        left_join(x, y, by = setdiff(names(x), "spend")) %>%
+            filter(round(.data$spend.x) != round(.data$spend.y)),
+        "The check_spend_sums() didn't pass. Problem data:"
+    )
 }
 
+#' Helper function for error message on failed check
+#' 
+#' @param dat_not_passed data frame to show why there is an error
+#' @param error_message error message to be printed in front of dat_not_passed
+#' @export
+check_message_error <- function(dat_not_passed, error_message) {
+    stop(
+        error_message, "\n",
+        paste0(capture.output(data.frame(dat_not_passed)), collapse = "\n"),
+        call. = FALSE
+    )
+}
