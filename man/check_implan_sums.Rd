@@ -4,7 +4,7 @@
 \alias{check_implan_sums}
 \title{Check whether the implan Excel sheets match spending by Ind/Comm}
 \usage{
-check_implan_sums(dat, filename, ..., print_compare = FALSE)
+check_implan_sums(dat, filename, ...)
 }
 \arguments{
 \item{dat}{data frame with spending by sector with 4 required columns:
@@ -14,8 +14,6 @@ group ("Ind" or "Comm"), sector (numeric), retail ("Yes" or "No"), spend (numeri
 
 \item{...}{Optional grouping variables (unquoted) for separating sheets
 across one or more dimensions}
-
-\item{print_compare}{If TRUE, show comparison between the 2 summaries}
 }
 \description{
 This is intended to be called after \code{\link{input}}. It checks sums for

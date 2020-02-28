@@ -65,7 +65,7 @@ input_header <- function(activity_type, activity_name, event_year) {
 #' # write sheets by activity
 #' \dontrun{
 #' input(spend_sector, "tmp2.xlsx", 2019, act)
-#' check_implan_sums(spend_sector, "tmp2.xlsx", act, print_compare = TRUE)
+#' check_implan_sums(spend_sector, "tmp2.xlsx", act)
 #' }
 input_prep <- function(dat, activity_name, event_year, group) {
     # collapse to sector-retail & add variables that might be needed
@@ -175,12 +175,11 @@ input <- function(dat, filename, event_year, ...) {
 #' "Ind" and "Comm" separately, based on grouping supplied by the dots argument.
 #' 
 #' @inheritParams input
-#' @param print_compare If TRUE, show comparison between the 2 summaries
 #' @family functions for implan input
 #' @export
 #' @examples 
 #' # see ?input_prep
-check_implan_sums <- function(dat, filename, ..., print_compare = FALSE) {
+check_implan_sums <- function(dat, filename, ...) {
     dims <- enquos(...)
     dat_grp <- dat %>%
         group_by(!!! dims, .data$group)
@@ -198,13 +197,17 @@ check_implan_sums <- function(dat, filename, ..., print_compare = FALSE) {
             sum()
         grp
     }, simplify = FALSE) %>% bind_rows()
-    
+   
     compare <- full_join(
         dat_sums, file_sums, by = group_vars(dat_grp), 
         suffix = c("_dat", "_file")
     )
-    if (print_compare) {
-        print(data.frame(compare))
-    }
-    all.equal(compare$spend_dat, compare$spend_file)
+    pass <- isTRUE(all.equal(compare$spend_dat, compare$spend_file))
+    if (pass) return(invisible())
+     
+    check_message_error(
+        filter(compare, round(.data$spend_dat) != round(.data$spend_file)),
+        "The check_implan_sums() didn't pass. Problem data:"
+    )
+    
 }

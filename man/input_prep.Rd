@@ -69,7 +69,7 @@ input_write(ind, "tmp.xlsx")
 # write sheets by activity
 \dontrun{
 input(spend_sector, "tmp2.xlsx", 2019, act)
-check_implan_sums(spend_sector, "tmp2.xlsx", act, print_compare = TRUE)
+check_implan_sums(spend_sector, "tmp2.xlsx", act)
 }
 }
 \seealso{
